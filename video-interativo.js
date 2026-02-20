@@ -89,7 +89,7 @@ class VideoInterativoUniversal {
                 </div>
             </div>
 
-            <div class="chapter-nav" id="chapterNav"></div>
+          
         `;
 
         this.wrapper = document.getElementById('videoWrapper');
