@@ -683,6 +683,7 @@ function syncEpisodesFromHTML() {
             sinopse: epEl.querySelector('.sinopse')?.innerHTML || '',
             bookText: epEl.querySelector('.book-text')?.innerHTML || '',
             formulaHTML: epEl.querySelector('.formula')?.innerHTML || '',
+            ytid: epEl.getAttribute('data-ytid') || null, // Novo: suporte a ID direto
             interacoes: parsedInteractions
         };
         window.episodesData.push(ep);
@@ -822,19 +823,43 @@ function changeSeason() {
 // ARMAZENAMENTO DE THUMBS GERADAS
 window.generatedThumbs = JSON.parse(sessionStorage.getItem('senaiThumbs') || '{}');
 
+/**
+ * Extrai o ID do YouTube de diversas variantes de URL
+ */
+function getYouTubeID(url) {
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[7].length == 11) ? match[7] : null;
+}
+
 async function captureVideoFrame(url, epId, originalThumb) {
     if (window.generatedThumbs[epId]) return window.generatedThumbs[epId];
     
-    // Se for YouTube, usamos a thumb oficial diretamente
-    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-        let videoId = "";
-        if (url.includes('embed/')) videoId = url.split('embed/')[1].split('?')[0];
-        else if (url.includes('v=')) videoId = url.split('v=')[1].split('&')[0];
-        else videoId = url.split('/').pop().split('?')[0];
-        
-        const thumbUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-        window.generatedThumbs[epId] = thumbUrl;
-        return thumbUrl;
+    // Tenta obter ID do objeto de episódio ou da URL
+    const ep = episodesData.find(e => e.id === epId);
+    const ytId = ep?.ytid || getYouTubeID(url);
+
+    if (ytId) {
+        // O YouTube oferece várias qualidades. Vamos tentar a máxima e ter fallback.
+        // maxresdefault -> hqdefault -> mqdefault
+        const thumbUrl = `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
+
+        // Verificação rápida se a imagem existe (YouTube retorna uma imagem de 120x90 "indisponível" se não houver maxres)
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                // Se a largura for 120, é o sinal do YouTube que a maxres não existe
+                if (img.width === 120) {
+                    resolve(`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`);
+                } else {
+                    window.generatedThumbs[epId] = thumbUrl;
+                    sessionStorage.setItem('senaiThumbs', JSON.stringify(window.generatedThumbs));
+                    resolve(thumbUrl);
+                }
+            };
+            img.onerror = () => resolve(`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`);
+            img.src = thumbUrl;
+        });
     }
 
     // Se for um vídeo direto (mp4/m3u8), tenta capturar o frame
@@ -872,6 +897,17 @@ async function captureVideoFrame(url, epId, originalThumb) {
         setTimeout(() => resolve(originalThumb), 3000);
     });
 }
+
+// Fechar navegação lateral ao clicar fora
+document.addEventListener('click', (e) => {
+    const nav = document.getElementById('animatedNav');
+    if (nav && nav.classList.contains('active')) {
+        const trigger = nav.querySelector('.toggle-trigger');
+        if (!nav.contains(e.target) && (!trigger || !trigger.contains(e.target))) {
+            nav.classList.remove('active');
+        }
+    }
+});
 
 function renderEpisodes() {
     const season = document.getElementById('seasonSelector').value;
@@ -927,6 +963,8 @@ function renderEpisodes() {
                 const thumbElem = document.getElementById(`thumb-${ep.id}`);
                 if (thumbElem) {
                     thumbElem.style.backgroundImage = `url('${dataUrl}')`;
+                    thumbElem.style.backgroundSize = 'cover';
+                    thumbElem.style.backgroundPosition = 'center';
                 }
             });
         }
