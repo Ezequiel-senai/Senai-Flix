@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+Single SCO with basic runtime calls. SCORM 1.2.
+
+Provided by Rustici Software - http://www.scorm.com
+
+This example demonstrates the use of basic runtime calls in a multi-page SCO. It
+includes a demonstration of bookmarking, status reporting (completion and success),
+score and time. It also includes the addition of a basic "controller" for providing
+intra-SCO navigation.
+-->
+<manifest
+  xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  identifier="com.scorm.golfsamples.runtime.basicruntime.12"
+  version="1"
+  xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd                              http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd                              http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd"
+>
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+  </metadata>
+  <organizations default="Simon Date">
+    <organization identifier="Simon Date">
+      <title>Senai</title>
+      <item
+        identifier="ITEM-F38F126D6F3A0BDC08F87115395AD981"
+        isvisible="true"
+        identifierref="RES-3AE9C8CBE7F723AA567ECC4B875684B9"
+      >
+        <title>Senai</title>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource
+      identifier="RES-3AE9C8CBE7F723AA567ECC4B875684B9"
+      type="webcontent"
+      href="index.html"
+    >
+      <file href="index.html" />
+      <file href="favicon.ico" />
+      <file href="static/css/main.32644562.css" />
+      <file href="static/js/main.bdbeb908.js" />
+    </resource>
+  </resources>
+</manifest>
