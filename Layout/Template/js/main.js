@@ -17,12 +17,17 @@ var settings = {
 }
 
 function setSettingsAccessibilityStorage(object) {
-    localStorage.setItem('settingsAccessibility', JSON.stringify(object))
+    if (typeof setSuspendDataValue === 'function') {
+        setSuspendDataValue('settingsAccessibility', object);
+    }
+    localStorage.setItem('settingsAccessibility', JSON.stringify(object));
 }
 
-// Caso exista dados salvos, aplicar todos os padrões ja aplicados do localstorage
-if (localStorage.getItem('settingsAccessibility')) {
-    settings = JSON.parse(localStorage.getItem('settingsAccessibility'))
+// Caso exista dados salvos, aplicar todos os padrões ja aplicados do localstorage ou SCORM
+if (typeof getSuspendDataValue === 'function' && getSuspendDataValue('settingsAccessibility')) {
+    settings = getSuspendDataValue('settingsAccessibility');
+} else if (localStorage.getItem('settingsAccessibility')) {
+    settings = JSON.parse(localStorage.getItem('settingsAccessibility'));
 }
 
 // Funções para marcar vídeos assistidos
@@ -692,9 +697,10 @@ function syncEpisodesFromHTML() {
             sinopse: epEl.querySelector('.sinopse')?.innerHTML || '',
             bookText: epEl.querySelector('.book-text')?.innerHTML || '',
             formulaHTML: epEl.querySelector('.formula')?.innerHTML || '',
-            ytid: epEl.getAttribute('data-ytid') || null, // Novo: suporte a ID direto
+            ytid: epEl.getAttribute('data-ytid') || null,
             interacoes: parsedInteractions
         };
+        console.log(`[syncEpisodesFromHTML] ${ep.id}: ${parsedInteractions.length} interações`);
         window.episodesData.push(ep);
     });
 }
@@ -1036,8 +1042,22 @@ function openVideoPlayer(url) {
     }
 
     // Buscar dados do episódio para as interações
-    const currentEpisode = episodesData.find(ep => ep.video === url);
+    // Tenta 1: URL exata. Tenta 2: ytid no URL. Tenta 3: URL parcial.
+    let currentEpisode = episodesData.find(ep => ep.video === url);
+    if (!currentEpisode) {
+        // Tentar extraindo o ytid da URL e comparando
+        const ytMatch = url.match(/v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/) || url.match(/embed\/([^?]+)/) || url.match(/watch\?v=([^&]+)/);
+        if (ytMatch) {
+            const ytid = ytMatch[1];
+            currentEpisode = episodesData.find(ep => ep.ytid === ytid);
+        }
+    }
+    if (!currentEpisode) {
+        // Correspondência parcial de URL
+        currentEpisode = episodesData.find(ep => ep.video && url && (ep.video.includes(url) || url.includes(ep.video.split('/').pop())));
+    }
     const interacoes = currentEpisode ? (currentEpisode.interacoes || []) : [];
+    console.log(`[openModalWithUrl] Episódio encontrado: ${currentEpisode?.id}, interações: ${interacoes.length}`);
 
     // RESOLVER URL REAL (Mapeamento de Redirecionamento para Link Direto)
     let finalUrl = url;
@@ -1061,13 +1081,20 @@ function openVideoPlayer(url) {
 
     // Inicializar Player Interativo
     if (typeof VideoInterativoUniversal !== 'undefined') {
-        window.interactivePlayerInstance = new VideoInterativoUniversal({
+        const videoOptions = {
             containerId: 'interactiveVideoContainer',
             videoUrl: finalUrl,
-            videoId: url, // Garante que a persistência (suspend_data) seja única por vídeo
+            videoId: currentEpisode ? currentEpisode.id : url,
             autoplay: true,
             interacoes: interacoes
-        });
+        };
+
+        // Se o episódio tem um YTID real, usar o link do YouTube para habilitar a API
+        if (currentEpisode && currentEpisode.ytid) {
+            videoOptions.videoUrl = `https://www.youtube.com/watch?v=${currentEpisode.ytid}`;
+        }
+
+        window.interactivePlayerInstance = new VideoInterativoUniversal(videoOptions);
     } else {
         console.warn('Classe VideoInterativoUniversal não encontrada.');
     }
@@ -1186,6 +1213,7 @@ function changeVideo(url) {
         window.interactivePlayerInstance = new VideoInterativoUniversal({
             containerId: 'interactiveVideoContainer',
             videoUrl: finalUrl,
+            videoId: currentEpisode ? currentEpisode.id : url,
             autoplay: true,
             interacoes: interacoes
         });

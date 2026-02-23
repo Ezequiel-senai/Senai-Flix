@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="icon" href="Layout/Template/img/favicon.ico" />
+    <link rel="icon" href="Layout/Template/img/favicon.ico">
     <title>Senai - Aula 1</title>
     <!-- Config -->
-    <script src="Layout/Template/js/main.js" defer></script>
+    <script src="Layout/Template/js/main.js" defer=""></script>
     <link rel="stylesheet" href="Layout/Template/css/theme.css">
     <link rel="stylesheet" href="Layout/Template/css/style.css">
     <!-- JQuery-->
@@ -18,20 +18,20 @@
     <!-- Bootstrap Icons -->
     <link href="Layout/Template/bibliotecas/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <!-- UiKit-->
-    <link href="Layout/Template/bibliotecas/uikit/css/uikit.min.css" rel="stylesheet" />
-    <script src="Layout/Template/bibliotecas/uikit/js/uikit.min.js" async></script>
-    <script src="Layout/Template/bibliotecas/uikit/js/uikit-icons.min.js" async></script>
+    <link href="Layout/Template/bibliotecas/uikit/css/uikit.min.css" rel="stylesheet">
+    <script src="Layout/Template/bibliotecas/uikit/js/uikit.min.js" async=""></script>
+    <script src="Layout/Template/bibliotecas/uikit/js/uikit-icons.min.js" async=""></script>
     <!-- BoxIcons -->
-    <link href="Layout/Template/bibliotecas/boxicons/css/boxicons.min.css" rel='stylesheet'>
-    <script src="Layout/Template/bibliotecas/boxicons/boxicons.js" defer></script>
+    <link href="Layout/Template/bibliotecas/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <script src="Layout/Template/bibliotecas/boxicons/boxicons.js" defer=""></script>
     <!-- SCORM -->
-    <script src="Layout/Template/scorm/APIWrapper.js" defer></script>
-    <script src="Layout/Template/scorm/SCOFunctions.js" defer></script>
+    <script src="Layout/Template/scorm/APIWrapper.js" defer=""></script>
+    <script src="Layout/Template/scorm/SCOFunctions.js" defer=""></script>
     <!-- Prism  -->
     <script src="Layout/Template/bibliotecas/prism/js/prism.js"></script>
-    <link href="Layout/Template/bibliotecas/prism/css/prism.css" rel='stylesheet'>
+    <link href="Layout/Template/bibliotecas/prism/css/prism.css" rel="stylesheet">
     <!-- VIDEO DO YOUTUBE -->
-    <link href="Layout/Template/bibliotecas/youtube/css/youtube-chapters.min.css" rel="stylesheet" />
+    <link href="Layout/Template/bibliotecas/youtube/css/youtube-chapters.min.css" rel="stylesheet">
     <!-- Grafico -->
     <script src="Layout/Template/bibliotecas/charts/chart.js"></script>
     <!-- Fancybox -->
@@ -49,9 +49,9 @@
 
 <body class="font">
     <header>
- <div vw class="enabled">
-    <div vw-access-button class="active"></div>
-    <div vw-plugin-wrapper>
+<div vw="" class="enabled">
+    <div vw-access-button="" class="active"></div>
+    <div vw-plugin-wrapper="">
       <div class="vw-plugin-top-wrapper"></div>
     </div>
   </div>
@@ -80,32 +80,31 @@
         <!-- Navegação Flutuante Lateral Glass (Animada) -->
         <nav class="glass-nav-left" id="animatedNav">
             <!-- 1. Gatilho: Botão Configurações (Engrenagem) -->
-            <button class="glass-btn btn-reset toggle-trigger" type="button" 
-                onclick="document.getElementById('animatedNav').classList.toggle('active')"
-                title="Configurações e Acessibilidade">
-                <i class='bx bx-cog bx-spin-hover'></i>
+            <button class="glass-btn btn-reset toggle-trigger" type="button"
+                onclick="document.getElementById('animatedNav').classList.toggle('active')" title="Configurações e Acessibilidade">
+                <i class="bx bx-cog bx-spin-hover"></i>
             </button>
 
             <!-- Itens que aparecem ao expandir -->
             <div class="nav-items-wrapper">
                 <!-- 2. Botão Tema (Input escondido para compatibilidade com main.js) -->
                 <input class="d-none" type="checkbox" id="themeSwitcher">
-                <button class="glass-btn" id="themeToggleBtn" title="Alternar Tema" type="button" 
+                <button class="glass-btn" id="themeToggleBtn" title="Alternar Tema" type="button"
                     onclick="document.getElementById('themeSwitcher').click()">
-                    <i class='bx bx-moon' id="icon-moon"></i>
-                    <i class='bx bx-sun' id="icon-sun"></i>
+                    <i class="bx bx-moon" id="icon-moon"></i>
+                    <i class="bx bx-sun" id="icon-sun"></i>
                 </button>
 
                 <!-- 3. Botão VLibras -->
                 <button class="glass-btn btn-reset" type="button" title="Tradutor VLibras" onclick="toggleVLibrasAndVideos()">
-                    <i class='bx bx-universal-access bx-flashing-hover'></i>
+                    <i class="bx bx-universal-access bx-flashing-hover"></i>
                 </button>
 
                 <!-- 4. Dropdown de Opções Extras -->
                 <div class="dropright">
-                    <button class="glass-btn btn-reset" type="button" id="configDropdown" data-bs-toggle="dropdown"
-                        aria-expanded="false" title="Mais Opções">
-                        <i class='bx bx-plus'></i>
+                    <button class="glass-btn btn-reset" type="button" id="configDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                        title="Mais Opções">
+                        <i class="bx bx-plus"></i>
                     </button>
                     <ul class="dropdown-menu border-0 shadow-lg p-3" aria-labelledby="configDropdown"
                         style=" backdrop-filter: blur(10px); min-width: 250px; margin-left: 15px;">
@@ -141,7 +140,7 @@
                
 
                 <div class="hero-video-container" id="heroVideoContainer">
-                    <video id="heroVideo" autoplay muted loop playsinline></video>
+                    <video id="heroVideo" autoplay="" muted="" loop="" playsinline=""></video>
                 </div>
 
                 <button id="muteBtn" onclick="toggleMute()">🔇</button>
@@ -163,15 +162,14 @@
 
                     <div class="hero-buttons">
                         <button id="heroPlayBtn" onclick="playFirstEpisode()">
-                            <span class="text-black"> <i class='bx bx-play text-black' title="play"></i></span> <span class="text-black"
+                            <span class="text-black"> <i class="bx bx-play text-black" title="play"></i></span> <span class="text-black"
                                 id="heroPlayBtnText">Começar</span>
                         </button>
                     </div>
                     <!-- Botão Fullscreen Relocado -->
                     <div class="mt-4">
-                        <button class="btn btn-outline border rounded d-flex align-items-center gap-2"
-                            onclick="toggleFullscreen()">
-                            <i class='bx bx-fullscreen fs-4 text-white'></i>
+                        <button class="btn btn-outline border rounded d-flex align-items-center gap-2" onclick="toggleFullscreen()">
+                            <i class="bx bx-fullscreen fs-4 text-white"></i>
                             <span class="small text-white">Clique aqui para habilitar a visualização em
                                 fullscreen.</span>
                         </button>
@@ -182,15 +180,14 @@
             <!-- Configuração de Vídeos de Fundo (Semântica HTML) -->
             <section class="backgroundVideos" style="display: none;">
                 <a id="s1" href="https://www.youtube.com/embed/jmLLKZxzEno?si=c9TKjYL27v7MeY06"></a>
-                <a id="s2"
-                    href="https://play.sesisenai.videolib.live/player?token=3fbb194fabd54888a47887e71a63d5ca"></a>
+                <a id="s2" href="https://play.sesisenai.videolib.live/player?token=3fbb194fabd54888a47887e71a63d5ca"></a>
             </section>
 
             <!-- Dados dos Episódios (Semântica HTML) -->
             <section class="episodesData" style="display: none;">
                 <!-- SA1: FUNDAMENTOS -->
-                <div id="s1recap" data-sa="s1" data-special="recap" data-num="0" data-type="video" data-ytid="k7C96T9X4A4"
-                    data-interacoes='[{"tempo":7,"titulo":"Prefixos","pergunta":"Potências de 10 são essenciais para entender prefixos como mili e micro?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto! Usamos potências de 10 para representar grandezas muito pequenas ou grandes."},{"texto":"Falso","correta":false,"msg":"Incorreto. As potências de 10 são a base dos prefixos métricos na elétrica."}]},{"tempo":18,"titulo":"Lei de Ohm","pergunta":"Isolamento de variáveis é a base para aplicar a Lei de Ohm (V=R.I)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Isso mesmo! Saber isolar o V, o R ou o I é fundamental."},{"texto":"Falso","correta":false,"msg":"Errado. Sem álgebra básica, não conseguimos calcular os componentes do circuito."}]}]'>
+                <div id="s1recap" data-sa="s1" data-special="recap" data-num="0" data-type="video" data-ytid="jmLLKZxzEno"
+                    data-interacoes='[{"tempo":7,"titulo":"Prefixos","pergunta":"Pot\u00eancias de 10 s\u00e3o essenciais para entender prefixos como mili e micro?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto! Usamos pot\u00eancias de 10 para representar grandezas muito pequenas ou grandes."},{"texto":"Falso","correta":false,"msg":"Incorreto. As pot\u00eancias de 10 s\u00e3o a base dos prefixos m\u00e9tricos na el\u00e9trica."}]},{"tempo":18,"titulo":"Lei de Ohm","pergunta":"Isolamento de vari\u00e1veis \u00e9 a base para aplicar a Lei de Ohm (V=R.I)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Isso mesmo! Saber isolar o V, o R ou o I \u00e9 fundamental."},{"texto":"Falso","correta":false,"msg":"Errado. Sem \u00e1lgebra b\u00e1sica, n\u00e3o conseguimos calcular os componentes do circuito."}]}]'>
                     <h1 class="title">Retomada da Unidade Anterior</h1>
                     <span class="duration">12 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1077774422758692dbce9402d0"></a>
@@ -214,10 +211,31 @@
                         <p>Prepare-se: Agora vamos usar essa base teórica para resolver problemas reais de campo.</p>
                     </div>
                     <div class="formula">Revisão</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="7" data-titulo="Prefixos">
+                        <div class="pergunta">Potências de 10 são essenciais para entender prefixos como mili e micro?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true"
+                                data-msg="Correto! Usamos potências de 10 para representar grandezas muito pequenas ou grandes.">
+                                Verdadeiro</div>
+                            <div class="opcao" data-correta="false"
+                                data-msg="Incorreto. As potências de 10 são a base dos prefixos métricos na elétrica.">Falso</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="18" data-titulo="Lei de Ohm">
+                        <div class="pergunta">Isolamento de variáveis é a base para aplicar a Lei de Ohm (V=R.I)?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Isso mesmo! Saber isolar o V, o R ou o I é fundamental.">
+                                Verdadeiro</div>
+                            <div class="opcao" data-correta="false"
+                                data-msg="Errado. Sem álgebra básica, não conseguimos calcular os componentes do circuito.">Falso</div>
+                        </div>
+                    </div>
+                </div>
                 </div>
 
-                <div id="s1e1" data-sa="s1" data-num="1" data-type="video" data-ytid="f-5yV67-o8M"
-                    data-interacoes='[{"tempo":12,"titulo":"Carga Elétrica","pergunta":"Qual é a unidade de medida da carga elétrica?","opcoes":[{"texto":"Volt (V)","correta":false,"msg":"Não, Volt mede a tensão elétrica."},{"texto":"Coulomb (C)","correta":true,"msg":"Acertou! 1 Coulomb equivale a aproximadamente 6,24 quintilhões de elétrons."}]},{"tempo":25,"titulo":"Materiais","pergunta":"O cobre é considerado um excelente isolante elétrico?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Erro. O cobre é um excelente CONDUTOR."},{"texto":"Falso","correta":true,"msg":"Correto! O cobre é um condutor, não um isolante."}]}]'>
+                <div id="s1e1" data-sa="s1" data-num="1" data-type="video" data-ytid="SfCg_1jikNk"
+                    data-interacoes='[{"tempo":12,"titulo":"Carga El\u00e9trica","pergunta":"Qual \u00e9 a unidade de medida da carga el\u00e9trica?","opcoes":[{"texto":"Ampere (A)","correta":false,"msg":"N\u00e3o, Ampere \u00e9 a unidade de medida da corrente el\u00e9trica."},{"texto":"Volt (V)","correta":false,"msg":"N\u00e3o, Volt mede a tens\u00e3o el\u00e9trica."},{"texto":"Coulomb (C)","correta":true,"msg":"Acertou! 1 Coulomb equivale a aproximadamente 6,24 quintilh\u00f5es de el\u00e9trons."},{"texto":"Ohm (\u03a9)","correta":false,"msg":"N\u00e3o, Ohm \u00e9 a unidade de medida da resist\u00eancia el\u00e9trica."}]},{"tempo":25,"titulo":"Materiais","pergunta":"O cobre \u00e9 considerado um excelente isolante el\u00e9trico?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Erro. O cobre \u00e9 um excelente CONDUTOR."},{"texto":"Falso","correta":true,"msg":"Correto! O cobre \u00e9 um condutor, n\u00e3o um isolante."}]},{"tempo":60,"titulo":"Estrutura At\u00f4mica","pergunta":"Os el\u00e9trons livres est\u00e3o localizados na camada de val\u00eancia?","opcoes":[{"texto":"Sim","correta":true,"msg":"Correto! A camada de val\u00eancia \u00e9 a mais externa."},{"texto":"N\u00e3o","correta":false,"msg":"Incorreto. \u00c9 na camada de val\u00eancia que eles residem."}]},{"tempo":120,"titulo":"Isolamento","pergunta":"O ar seco pode se tornar um condutor se a tens\u00e3o for muito alta?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Exato! Isso ocorre na ruptura diiel\u00e9trica, como nos raios."},{"texto":"Falso","correta":false,"msg":"Incorreto. Com tens\u00e3o suficiente, at\u00e9 o ar conduz eletricidade."}]}]'>
                     <h1 class="title">Natureza da Eletricidade</h1>
                     <span class="duration">58 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1076695620967692dbc8250aa5"></a>
@@ -262,10 +280,48 @@
                             classe de tensão dele.</p>
                     </div>
                     <div class="formula">Q = n . e</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="12" data-titulo="Carga Elétrica">
+                        <div class="pergunta">Qual é a unidade de medida da carga elétrica?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="false" data-msg="Não, Ampere é a unidade de medida da corrente elétrica.">
+                                Ampere (A)</div>
+                            <div class="opcao" data-correta="false" data-msg="Não, Volt mede a tensão elétrica.">Volt (V)</div>
+                            <div class="opcao" data-correta="true"
+                                data-msg="Acertou! 1 Coulomb equivale a aproximadamente 6,24 quintilhões de elétrons.">Coulomb (C)</div>
+                            <div class="opcao" data-correta="false" data-msg="Não, Ohm é a unidade de medida da resistência elétrica.">
+                                Ohm (Ω)</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="25" data-titulo="Materiais">
+                        <div class="pergunta">O cobre é considerado um excelente isolante elétrico?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="false" data-msg="Erro. O cobre é um excelente CONDUTOR.">Verdadeiro</div>
+                            <div class="opcao" data-correta="true" data-msg="Correto! O cobre é um condutor, não um isolante.">Falso
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="60" data-titulo="Estrutura Atômica">
+                        <div class="pergunta">Os elétrons livres estão localizados na camada de valência?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Correto! A camada de valência é a mais externa.">Sim</div>
+                            <div class="opcao" data-correta="false" data-msg="Incorreto. É na camada de valência que eles residem.">Não
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="120" data-titulo="Isolamento">
+                        <div class="pergunta">O ar seco pode se tornar um condutor se a tensão for muito alta?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Exato! Isso ocorre na ruptura dielétrica, como nos raios.">
+                                Verdadeiro</div>
+                            <div class="opcao" data-correta="false"
+                                data-msg="Incorreto. Com tensão suficiente, até o ar conduz eletricidade.">Falso</div>
+                        </div>
+                    </div>
+                </div>
                 </div>
 
-                <div id="s1e2" data-sa="s1" data-num="2" data-type="mesacast" data-ytid="f-5yV67-o8M"
-                    data-interacoes='[{"tempo":9,"titulo":"Definição","pergunta":"A Tensão Elétrica é a pressão que empurra os elétrons no circuito?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto! Sem essa pressão (DDP), não há fluxo de cargas."},{"texto":"Falso","correta":false,"msg":"Incorreto. A voltagem atua como a pressão em um sistema hidráulico."}]},{"tempo":22,"titulo":"Medição","pergunta":"Para medir tensão, o multímetro deve estar em série com a carga?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Errado. Tensão se mede sempre em PARALELO."},{"texto":"Falso","correta":true,"msg":"Boa! Medimos tensão em paralelo para captar a diferença de potencial."}]}]'>
+                <div id="s1e2" data-sa="s1" data-num="2" data-type="mesacast" data-ytid="CIIh3LNn8m0">
                     <h1 class="title">Tensão Elétrica (DDP)</h1>
                     <span class="duration">47 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1078611813412692dbd3b69c6f"></a>
@@ -307,9 +363,35 @@
                             "está" lá.</p>
                     </div>
                     <div class="formula">V = W / Q</div>
-                </div>
-                <div id="s1e3" data-sa="s1" data-num="3" data-type="podcast" data-ytid="k7C96T9X4A4"
-                    data-interacoes='[{"tempo":11,"titulo":"Unidade","pergunta":"Qual é a unidade de medida da intensidade da corrente elétrica?","opcoes":[{"texto":"Ohm (Ω)","correta":false,"msg":"Ohm mede a resistência."},{"texto":"Ampere (A)","correta":true,"msg":"Excelente! O Ampere mede a taxa de fluxo de carga."}]},{"tempo":28,"titulo":"Sentido","pergunta":"No sentido convencional, a corrente flui do Positivo (+) para o Negativo (-)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto. Este é o padrão usado em todos os esquemas elétricos."},{"texto":"Falso","correta":false,"msg":"Na verdade, embora o sentido real seja dos elétrons, o convencional é do + para o -."}]}]'>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="45" data-titulo="Definição de Tensão">
+                        <div class="pergunta">A Tensão Elétrica (DDP) pode ser comparada à pressão em um sistema hidráulico?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true"
+                                data-msg="Correto! Assim como a pressão empurra a água, a tensão empurra os elétrons.">Verdadeiro</div>
+                            <div class="opcao" data-correta="false"
+                                data-msg="Incorreto. A analogia da pressão é a mais comum para explicar a DDP.">Falso</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="180" data-titulo="Unidade da Tensão">
+                        <div class="pergunta">Qual é a unidade de medida da tensão elétrica?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="false" data-msg="Errado. Ampere mede a corrente.">Ampere (A)</div>
+                            <div class="opcao" data-correta="true" data-msg="Excelente! O Volt é a unidade de diferença de potencial.">
+                                Volt (V)</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="300" data-titulo="Ligação do Multímetro">
+                        <div class="pergunta">Para medir tensão, o multímetro deve ser ligado em paralelo com a carga?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Correto! Tensão se mede em paralelo.">Sim</div>
+                            <div class="opcao" data-correta="false" data-msg="Errado. Se ligar em série, a medição não será de tensão.">
+                                Não</div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    <div id="s1e3" data-sa="s1" data-num="3" data-type="podcast" data-ytid="KgJla5Z0FDM">
                     <h1 class="title">Corrente Elétrica</h1>
                     <span class="duration">52 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1079757631913692dbd92d407a"></a>
@@ -348,9 +430,36 @@
                             imediato e queimará o fusível do seu aparelho.</p>
                     </div>
                     <div class="formula">I = V / R</div>
-                </div>
-                <div id="s1e4" data-sa="s1" data-num="4" data-type="video" data-ytid="f-5yV67-o8M"
-                    data-interacoes='[{"tempo":14,"titulo":"Geometria","pergunta":"Quanto mais grosso for um fio (maior área), maior será sua resistência?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Erro. Fios mais grossos têm MENOR resistência."},{"texto":"Falso","correta":true,"msg":"Exato! Um fio mais largo oferece menos oposição ao fluxo."}]},{"tempo":32,"titulo":"Material","pergunta":"A unidade de medida da resistência elétrica é o Ohm (Ω)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Isso mesmo, em homenagem a Georg Simon Ohm."},{"texto":"Falso","correta":false,"msg":"Errado. O Ohm é a unidade padrão de resistência."}]}]'>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="60" data-titulo="Natureza da Corrente">
+                        <div class="pergunta">A corrente elétrica é o movimento ordenado de cargas elétricas?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Correto! É o fluxo de elétrons em um condutor.">Sim</div>
+                            <div class="opcao" data-correta="false" data-msg="Incorreto. Sem movimento ordenado não há corrente.">Não
+                            </div>
+                        </div>
+                        </div>
+                        <div class="interacao" data-tempo="240" data-titulo="Sentido Convencional">
+                            <div class="pergunta">No sentido convencional, a corrente flui do pólo positivo para o negativo?</div>
+                            <div class="opcoes">
+                                <div class="opcao" data-correta="true" data-msg="Isso mesmo! É o padrão usado na análise de circuitos.">
+                                    Verdadeiro</div>
+                                <div class="opcao" data-correta="false"
+                                    data-msg="Errado. O sentido real é do - para o +, mas o convencional é do + para o -.">Falso</div>
+                            </div>
+                        </div>
+                        <div class="interacao" data-tempo="420" data-titulo="Efeito Joule">
+                            <div class="pergunta">O aquecimento de um condutor pela passagem da corrente é chamado de:</div>
+                            <div class="opcoes">
+                                <div class="opcao" data-correta="true" data-msg="Perfeito! É a transformação de energia elétrica em térmica.">
+                                    Efeito Joule</div>
+                                <div class="opcao" data-correta="false" data-msg="Não. O efeito Doppler é relacionado a ondas sonoras/luz.">
+                                    Efeito Doppler</div>
+                            </div>
+                        </div>
+                        </div>
+                        </div>
+                        <div id="s1e4" data-sa="s1" data-num="4" data-type="video" data-ytid="E738SS5QwhU">
                     <h1 class="title">Resistência Elétrica</h1>
                     <span class="duration">45 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=10802032402770692dbe144bcef"></a>
@@ -390,9 +499,36 @@
                             vital.</p>
                     </div>
                     <div class="formula">R = ρ (L / A)</div>
-                </div>
-                <div id="s1e5" data-sa="s1" data-num="5" data-type="mesacast"
-                    data-interacoes='[{"tempo":10,"titulo":"Proporcionalidade","pergunta":"Se mantivermos a tensão fixa e aumentarmos a resistência, a corrente irá diminuir?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto! Corrente e resistência são inversamente proporcionais."},{"texto":"Falso","correta":false,"msg":"Incorreto. Mais resistência significa menos fluxo de elétrons."}]},{"tempo":20,"titulo":"Fórmula","pergunta":"Qual é a fórmula matemática correta da Lei de Ohm?","opcoes":[{"texto":"V = R . I","correta":true,"msg":"Perfeito! Tensão é igual a resistência vezes corrente."},{"texto":"V = R / I","correta":false,"msg":"Errado. A relação correta é de multiplicação."}]}]'>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="90" data-titulo="Oposição ao Fluxo">
+                        <div class="pergunta">A resistência elétrica é a oposição que os materiais oferecem à corrente?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true"
+                                data-msg="Correto! Quanto maior a resistência, menor a corrente para a mesma tensão.">Verdadeiro</div>
+                            <div class="opcao" data-correta="false"
+                                data-msg="Incorreto. A resistência é justamente essa dificuldade imposta.">Falso</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="300" data-titulo="Segunda Lei de Ohm">
+                        <div class="pergunta">Se aumentarmos o comprimento de um fio, sua resistência:</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true"
+                                data-msg="Exato! O comprimento é diretamente proporcional à resistência.">Aumenta</div>
+                            <div class="opcao" data-correta="false" data-msg="Errado. Fios mais longos oferecem mais resistência.">
+                                Diminui</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="540" data-titulo="Material do Condutor">
+                        <div class="pergunta">Qual destes materiais possui menor resistividade elétrica?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="false" data-msg="Não. O ferro é um condutor pior que o cobre.">Ferro</div>
+                            <div class="opcao" data-correta="true" data-msg="Excelente! O cobre é um dos melhores condutores comerciais.">
+                                Cobre</div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    <div id="s1e5" data-sa="s1" data-num="5" data-type="mesacast" data-ytid="cUZ3MXap3ik">
                     <h1 class="title">Lei de Ohm</h1>
                     <span class="duration">60 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1081635063246692dc03853f1b"></a>
@@ -422,9 +558,26 @@
                             circuito.</p>
                     </div>
                     <div class="formula">V = R . I</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="120" data-titulo="Triângulo de Ohm">
+                        <div class="pergunta">Se V = 12V e R = 4Ω, qual é a corrente (I)?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Correto! I = V / R = 12 / 4.">3 A</div>
+                            <div class="opcao" data-correta="false" data-msg="Errado. Você multiplicou em vez de dividir.">48 A</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="600" data-titulo="Análise de Falha">
+                        <div class="pergunta">Um circuito com resistência infinita indica:</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="false"
+                                data-msg="Incorreto. Curto-circuito tem resistência próxima de zero.">Curto-circuito</div>
+                            <div class="opcao" data-correta="true"
+                                data-msg="Isso mesmo! Resistência infinita significa interrupção no fluxo.">Circuito aberto</div>
+                        </div>
+                    </div>
                 </div>
-                <div id="s1e6" data-sa="s1" data-num="6" data-type="podcast"
-                    data-interacoes='[{"tempo":10,"titulo":"Watts","pergunta":"A Potência Elétrica, que representa o trabalho realizado, é medida em Watts (W)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Sim! O Watt mede a taxa de conversão de energia."},{"texto":"Falso","correta":false,"msg":"Incorreto. Watts é a unidade padrão de potência."}]},{"tempo":20,"titulo":"Consumo","pergunta":"A energia (kWh) cobrada na conta de luz é a potência multiplicada pelo tempo?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Exatamente! Energia é o acúmulo da potência usada ao longo do tempo."},{"texto":"Falso","correta":false,"msg":"Errado. kWh é justamente potência (kW) vezes horas (h)."}]}]'>
+                </div>
+                <div id="s1e6" data-sa="s1" data-num="6" data-type="podcast" data-ytid="18hdDSUlM30">
                     <h1 class="title">Potência Elétrica</h1>
                     <span class="duration">49 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=10821266185906692dc07da0747"></a>
@@ -465,15 +618,33 @@
                             térmica.</p>
                     </div>
                     <div class="formula">P = V . I</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="10" data-titulo="Watts">
+                        <div class="pergunta">A Potência Elétrica, que representa o trabalho realizado, é medida em Watts (W)?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Sim! O Watt mede a taxa de conversão de energia.">
+                                Verdadeiro</div>
+                            <div class="opcao" data-correta="false" data-msg="Incorreto. Watts é a unidade padrão de potência.">Falso
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="20" data-titulo="Consumo">
+                        <div class="pergunta">A energia (kWh) cobrada na conta de luz é a potência multiplicada pelo tempo?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true"
+                                data-msg="Exatamente! Energia é o acúmulo da potência usada ao longo do tempo.">Verdadeiro</div>
+                            <div class="opcao" data-correta="false" data-msg="Errado. kWh é justamente potência (kW) vezes horas (h).">
+                                Falso</div>
+                        </div>
+                    </div>
+                </div>
                 </div>
 
                 <!-- SA2: ELETRÔNICA -->
-                <div id="s2e1" data-sa="s2" data-num="1" data-type="podcast" data-ytid="k7C96T9X4A4"
-                    data-interacoes='[{"tempo":13,"titulo":"Frequência","pergunta":"No Brasil, a frequência da Corrente Alternada é de 60 ciclos por segundo (60Hz)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto! Este é o padrão nacional de distribuição."},{"texto":"Falso","correta":false,"msg":"Errado. No Brasil adotamos o padrão de 60Hz."}]},{"tempo":26,"titulo":"Eficaz","pergunta":"O valor de 127V ou 220V que lemos no multímetro é o valor de Pico da onda?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Incorreto. Multímetros mostram o valor eficaz (RMS). O pico é maior."},{"texto":"Falso","correta":true,"msg":"Muito bem! Lemos o valor RMS; o pico chega a ser ~41% maior."}]}]'>
+                <div id="s2e1" data-sa="s2" data-num="1" data-type="podcast">
                     <h1 class="title">Corrente Alternada (CA)</h1>
                     <span class="duration">55 min</span>
-                    <a class="video"
-                        href="https://play.sesisenai.videolib.live/index.html?token=3fbb194fabd54888a47887e71a63d5ca"></a>
+                    <a class="video" href="https://play.sesisenai.videolib.live/index.html?token=3fbb194fabd54888a47887e71a63d5ca"></a>
                     
                     <p class="sinopse">O mundo oscila. Frequência, Período e Amplitude. Entenda por que a energia chega
                         na sua casa
@@ -505,13 +676,31 @@
                             rede.</p>
                     </div>
                     <div class="formula">f = 1 / T</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="120" data-titulo="Padrão de Frequência">
+                        <div class="pergunta">A frequência de 60Hz significa que a polaridade inverte quantas vezes por segundo?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="false" data-msg="Quase! São 60 ciclos, mas 120 inversões de polaridade.">60
+                                vezes</div>
+                            <div class="opcao" data-correta="true" data-msg="Exato! Cada ciclo tem duas alternâncias de polaridade.">120
+                                vezes</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="480" data-titulo="Vrms vs Vpico">
+                        <div class="pergunta">Um multímetro comum mede qual valor da tensão alternada?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Correto! É o valor que o multímetro exibe.">Valor Eficaz
+                                (RMS)</div>
+                            <div class="opcao" data-correta="false" data-msg="Errado. O valor de pico só é visto no osciloscópio.">Valor
+                                de Pico</div>
+                        </div>
+                    </div>
                 </div>
-                <div id="s2e2" data-sa="s2" data-num="2" data-type="video" data-ytid="f-5yV67-o8M"
-                    data-interacoes='[{"tempo":8,"titulo":"Pólos","pergunta":"Em magnetismo, pólos iguais se atraem e opostos se repelem?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Errado. A regra é opostos se atraem, iguais se repelem."},{"texto":"Falso","correta":true,"msg":"Correto! Opostos se atraem (Norte atrai Sul)."}]},{"tempo":24,"titulo":"Materiais","pergunta":"O ferro e o níquel são considerados materiais ferromagnéticos?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Isso! Eles são fortemente influenciados por campos magnéticos."},{"texto":"Falso","correta":false,"msg":"Incorreto. Ferro e níquel são os principais exemplos de materiais ferromagnéticos."}]}]'>
+                </div>
+                <div id="s2e2" data-sa="s2" data-num="2" data-type="video">
                     <h1 class="title">Magnetismo</h1>
                     <span class="duration">48 min</span>
-                    <a class="video"
-                        href="https://play.sesisenai.videolib.live/index.html?token=48e0178061a64871a5e903447b3a47b3"></a>
+                    <a class="video" href="https://play.sesisenai.videolib.live/index.html?token=48e0178061a64871a5e903447b3a47b3"></a>
                     
                     <p class="">Campos invisíveis. Pólos Norte e Sul, linhas de força e como os materiais
                         ferromagnéticos se
@@ -537,14 +726,32 @@
                         </ol>
                     </div>
                     <div class="formula">Φ = B . A</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="8" data-titulo="Pólos">
+                        <div class="pergunta">Em magnetismo, pólos iguais se atraem e opostos se repelem?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="false" data-msg="Errado. A regra é opostos se atraem, iguais se repelem.">
+                                Verdadeiro</div>
+                            <div class="opcao" data-correta="true" data-msg="Correto! Opostos se atraem (Norte atrai Sul).">Falso</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="24" data-titulo="Materiais">
+                        <div class="pergunta">O ferro e o níquel são considerados materiais ferromagnéticos?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true"
+                                data-msg="Isso! Eles são fortemente influenciados por campos magnéticos.">Verdadeiro</div>
+                            <div class="opcao" data-correta="false"
+                                data-msg="Incorreto. Ferro e níquel são os principais exemplos de materiais ferromagnéticos.">Falso
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 </div>
 
-                <div id="s2e3" data-sa="s2" data-num="3" data-type="mesacast"
-                    data-interacoes='[{"tempo":15,"titulo":"Regra","pergunta":"A Regra da Mão Direita serve para identificar o sentido do campo magnético em um fio?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Exato! O polegar indica a corrente e os dedos o campo."},{"texto":"Falso","correta":false,"msg":"Errado. Esta é exatamente a função da Regra da Mão Direita."}]},{"tempo":35,"titulo":"Indução","pergunta":"Para gerar energia por indução (Faraday), o campo magnético deve estar parado?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Erro. É preciso variação ou movimento para haver indução."},{"texto":"Falso","correta":true,"msg":"Correto! É necessário variação no campo magnético para induzir tensão."}]}]'>
+                <div id="s2e3" data-sa="s2" data-num="3" data-type="mesacast">
                     <h1 class="title">Eletromagnetismo</h1>
                     <span class="duration">50 min</span>
-                    <a class="video"
-                        href="https://play.sesisenai.videolib.live/index.html?token=b94eeab13d1d4bd28cc913cd38706558"></a>
+                    <a class="video" href="https://play.sesisenai.videolib.live/index.html?token=b94eeab13d1d4bd28cc913cd38706558"></a>
                     
                     <p class="sinopse">Eletricidade vira ímã, ímã vira eletricidade. A Experiência de Oersted e a Lei de
                         Faraday: os
@@ -572,14 +779,33 @@
                         </ol>
                     </div>
                     <div class="formula">ε = -N (ΔΦ/Δt)</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="15" data-titulo="Regra">
+                        <div class="pergunta">A Regra da Mão Direita serve para identificar o sentido do campo magnético em um fio?
+                        </div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Exato! O polegar indica a corrente e os dedos o campo.">
+                                Verdadeiro</div>
+                            <div class="opcao" data-correta="false"
+                                data-msg="Errado. Esta é exatamente a função da Regra da Mão Direita.">Falso</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="35" data-titulo="Indução">
+                        <div class="pergunta">Para gerar energia por indução (Faraday), o campo magnético deve estar parado?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="false"
+                                data-msg="Erro. É preciso variação ou movimento para haver indução.">Verdadeiro</div>
+                            <div class="opcao" data-correta="true"
+                                data-msg="Correto! É necessário variação no campo magnético para induzir tensão.">Falso</div>
+                        </div>
+                    </div>
+                </div>
                 </div>
 
-                <div id="s2e4" data-sa="s2" data-num="4" data-type="video"
-                    data-interacoes='[{"tempo":10,"titulo":"Operação","pergunta":"Transformadores funcionam perfeitamente quando alimentados com Corrente Contínua (DC)?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Incorreto. Eles exigem Corrente Alternada para criar variação de campo."},{"texto":"Falso","correta":true,"msg":"Correto! Em DC o campo não varia e não há transferência para o secundário."}]},{"tempo":20,"titulo":"Relação","pergunta":"Se o secundário tem menos voltas que o primário, a tensão de saída será menor?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Sim! É um transformador rebaixador."},{"texto":"Falso","correta":false,"msg":"Errado. A tensão é proporcional ao número de espiras."}]}]'>
+                <div id="s2e4" data-sa="s2" data-num="4" data-type="video">
                     <h1 class="title">Transformadores</h1>
                     <span class="duration">59 min</span>
-                    <a class="video"
-                        href="https://play.sesisenai.videolib.live/index.html?token=8d455b1d58e64f919a99d26714055c5e"></a>
+                    <a class="video" href="https://play.sesisenai.videolib.live/index.html?token=8d455b1d58e64f919a99d26714055c5e"></a>
                     
                     <p class="sinopse">Máquinas de Indução. Como alterar valores de tensão e corrente mantendo a
                         potência (quase)
@@ -592,9 +818,9 @@
                             retificação.</p>
                         <p class="fw-bold">CONCEITOS CHAVE</p>
                         <ol>
-                            <li><strong>Funcionamento:</strong> Corrente Alternada no Primário -> Gera Campo Magnético
+                            <li><strong>Funcionamento:</strong> Corrente Alternada no Primário -&gt; Gera Campo Magnético
                                 Variável no
-                                Núcleo -> Induz Tensão no Secundário. <em>*Atenção: Transformadores NÃO funcionam com
+                                Núcleo -&gt; Induz Tensão no Secundário. <em>*Atenção: Transformadores NÃO funcionam com
                                     Corrente
                                     Contínua (DC), pois o campo magnético não varia e não há indução.*</em></li>
                             <li><strong>Relação de Transformação:</strong> Se o secundário tem metade das voltas do
@@ -612,13 +838,31 @@
                             separando eletricamente o circuito da rede da concessionária (isolação galvânica).</p>
                     </div>
                     <div class="formula">Vp/Vs = Np/Ns</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="150" data-titulo="Princípio de Funcionamento">
+                        <div class="pergunta">Transformadores funcionam por meio de qual fenômeno?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Correto! É a base das máquinas elétricas estáticas.">
+                                Indução Eletromagnética</div>
+                            <div class="opcao" data-correta="false" data-msg="Incorreto. Calor é apenas uma perda no processo.">Condução
+                                Térmica</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="400" data-titulo="Relacão de Espiras">
+                        <div class="pergunta">Se o secundário tem mais voltas que o primário, o transformador é:</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Exato! A tensão aumenta proporcionalmente às espiras.">
+                                Elevador</div>
+                            <div class="opcao" data-correta="false" data-msg="Errado. Rebaixadores têm menos espiras no secundário.">
+                                Rebaixador</div>
+                        </div>
+                    </div>
                 </div>
-                <div id="s2e5" data-sa="s2" data-num="5" data-type="podcast"
-                    data-interacoes='[{"tempo":10,"titulo":"Armazenamento","pergunta":"A função principal de um capacitor é armazenar energia em forma de campo elétrico?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto! Eles agem como tanques de elétrons."},{"texto":"Falso","correta":false,"msg":"Incorreto. O capacitor armazena cargas eletrostáticas."}]},{"tempo":20,"titulo":"Unidade","pergunta":"A unidade de medida da capacitância é o Farad (F)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Isso mesmo, em homenagem a Michael Faraday."},{"texto":"Falso","correta":false,"msg":"Errado. O Farad é a unidade padrão internacional."}]}]'>
+                </div>
+                <div id="s2e5" data-sa="s2" data-num="5" data-type="podcast">
                     <h1 class="title">Capacitores</h1>
                     <span class="duration">46 min</span>
-                    <a class="video"
-                        href="https://play.sesisenai.videolib.live/index.html?token=79b8eb3f0a7849faa8b6fd72c4896859"></a>
+                    <a class="video" href="https://play.sesisenai.videolib.live/index.html?token=79b8eb3f0a7849faa8b6fd72c4896859"></a>
                     
                     <p class="sinopse">Tanques de elétrons. Armazenamento de campo elétrico, filtragem de fontes e
                         correção de fator
@@ -659,6 +903,26 @@
                         </ol>
                     </div>
                     <div class="formula">C = Q / V</div>
+                <div class="interactive-questions" style="display: none;">
+                    <div class="interacao" data-tempo="10" data-titulo="Armazenamento">
+                        <div class="pergunta">A função principal de um capacitor é armazenar energia em forma de campo elétrico?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Correto! Eles agem como tanques de elétrons.">Verdadeiro
+                            </div>
+                            <div class="opcao" data-correta="false" data-msg="Incorreto. O capacitor armazena cargas eletrostáticas.">
+                                Falso</div>
+                        </div>
+                    </div>
+                    <div class="interacao" data-tempo="20" data-titulo="Unidade">
+                        <div class="pergunta">A unidade de medida da capacitância é o Farad (F)?</div>
+                        <div class="opcoes">
+                            <div class="opcao" data-correta="true" data-msg="Isso mesmo, em homenagem a Michael Faraday.">Verdadeiro
+                            </div>
+                            <div class="opcao" data-correta="false" data-msg="Errado. O Farad é a unidade padrão internacional.">Falso
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 </div>
             </section>
 
@@ -687,39 +951,33 @@
                     </div>
                     <!-- Conteúdo com Abas -->
                     <div class="modal-tabs-container">
-                        <div
-                            class="d-flex justify-content-between align-items-center flex-wrap px-3 border-bottom border-secondary">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap px-3 border-bottom border-secondary">
                             <ul class="nav nav-tabs custom-player-tabs border-0" id="playerTab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="synopsis-tab" data-bs-toggle="tab"
-                                        data-bs-target="#synopsis-pane" type="button" role="tab"
-                                        aria-controls="synopsis-pane" aria-selected="true">Sinopse</button>
+                                    <button class="nav-link active" id="synopsis-tab" data-bs-toggle="tab" data-bs-target="#synopsis-pane" type="button"
+                                        role="tab" aria-controls="synopsis-pane" aria-selected="true">Sinopse</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="episodes-tab" data-bs-toggle="tab"
-                                        data-bs-target="#episodes-pane" type="button" role="tab"
+                                    <button class="nav-link" id="episodes-tab" data-bs-toggle="tab" data-bs-target="#episodes-pane" type="button" role="tab"
                                         aria-controls="episodes-pane" aria-selected="false">Episódios</button>
                                 </li>
                             </ul>
 
                             <!-- Botão Próximo Episódio Relocado -->
                             <div id="nextEpisodeBtnContainer" style="display: none;">
-                                <button id="nextEpisodeBtn" class="btn btn-sm btn-outline-danger"
-                                    onclick="playNextEpisode()">
-                                    Próximo Episódio <i class='bx bx-skip-next-circle'></i>
+                                <button id="nextEpisodeBtn" class="btn btn-sm btn-outline-danger" onclick="playNextEpisode()">
+                                    Próximo Episódio <i class="bx bx-skip-next-circle"></i>
                                 </button>
                             </div>
                         </div>
 
                         <div class="tab-content player-tab-content p-4" id="playerTabContent">
                             <!-- Aba Sinopse -->
-                            <div class="tab-pane fade show active" id="synopsis-pane" role="tabpanel"
-                                aria-labelledby="synopsis-tab" tabindex="0">
+                            <div class="tab-pane fade show active" id="synopsis-pane" role="tabpanel" aria-labelledby="synopsis-tab" tabindex="0">
                                 <div id="currentEpisodeSynopsis"></div>
                             </div>
                             <!-- Aba Episódios -->
-                            <div class="tab-pane fade" id="episodes-pane" role="tabpanel" aria-labelledby="episodes-tab"
-                                tabindex="0">
+                            <div class="tab-pane fade" id="episodes-pane" role="tabpanel" aria-labelledby="episodes-tab" tabindex="0">
                                 <div id="fullEpisodesList" class="playlist-vertical"></div>
                             </div>
                         </div>
@@ -732,16 +990,14 @@
                 style="background-color: rgba(0,0,0,0.95); z-index: 99990; transition: opacity 0.3s ease;">
                 <div class="bg-dark rounded-3 p-4 p-md-5 overflow-auto position-relative shadow-lg"
                     style="width: 90%; max-width: 1100px; height: 85vh;">
-                    <div
-                        class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4">
                         <h2 class="h2 m-0 text-white">Central de Conhecimento</h2>
-                        <button onclick="closeDetails()" class="btn btn-link text-white p-0 fs-1 lh-1">&times;</button>
+                        <button onclick="closeDetails()" class="btn btn-link text-white p-0 fs-1 lh-1">×</button>
                     </div>
 
                     <div class="mb-4">
                         <label class="me-2 text-secondary">Filtrar por:</label>
-                        <select id="detailsSeasonSelect" onchange="filterDetailsGrid()"
-                            class="bg-secondary text-white border-0 p-2 rounded">
+                        <select id="detailsSeasonSelect" onchange="filterDetailsGrid()" class="bg-secondary text-white border-0 p-2 rounded">
                             <option value="s1">Situação de Aprendizagem 1</option>
                             <option value="s2">Situação de Aprendizagem 2</option>
                         </select>
@@ -757,11 +1013,10 @@
                 <div class="bg-light text-dark rounded-3 overflow-hidden d-flex flex-column position-relative shadow-lg"
                     style="width: 90%; max-width: 900px; height: 85vh; font-family: 'Georgia', serif;">
                     <button onclick="closeConcept()"
-                        class="btn btn-link text-secondary p-0 fs-1 lh-1 position-absolute top-0 end-0 mt-2 me-4 z-3">&times;</button>
+                        class="btn btn-link text-secondary p-0 fs-1 lh-1 position-absolute top-0 end-0 mt-2 me-4 z-3">×</button>
 
                     <div class="flex-grow-1 p-4 p-md-5 overflow-auto">
-                        <div class="small text-uppercase ls-lg text-secondary mb-1 fw-bold"
-                            style="letter-spacing: 2px;">Briefing Técnico
+                        <div class="small text-uppercase ls-lg text-secondary mb-1 fw-bold" style="letter-spacing: 2px;">Briefing Técnico
                         </div>
                         <h1 id="bookTitle" class="h2 fw-bold mb-4 pb-3 border-bottom border-warning border-3 text-dark">
                             Título do Assunto
@@ -770,23 +1025,20 @@
                         <div class="row g-4">
                             <div class="col-lg-8">
                                 <div id="bookText" class="fs-5 lh-base text-justify"></div>
-                                <div
-                                    class="mt-4 p-3 bg-white border-start border-warning border-4 fst-italic text-secondary">
+                                <div class="mt-4 p-3 bg-white border-start border-warning border-4 fst-italic text-secondary">
                                     "A teoria guia, a
                                     prática confirma."</div>
                             </div>
 
                             <div class="col-lg-4 d-flex flex-column gap-4">
                                 <div class="bg-white border p-2 text-center">
-                                    <img id="bookImage" src="" class="img-fluid rounded mb-2"
-                                        style="max-height: 200px; object-fit: contain; display: none;"
+                                    <img id="bookImage" src="" class="img-fluid rounded mb-2" style="max-height: 200px; object-fit: contain; display: none;"
                                         onerror="this.style.display='none'">
                                     <div class="small text-muted">Referência</div>
                                 </div>
                                 <div class="bg-white border border-dark border-2 p-4 text-center">
                                     <div class="small fw-bold text-uppercase mb-2">ELEMENTO CHAVE</div>
-                                    <div id="bookFormula" class="h3 fw-bold text-warning font-serif"
-                                        style="font-family: 'Times New Roman', serif;">
+                                    <div id="bookFormula" class="h3 fw-bold text-warning font-serif" style="font-family: 'Times New Roman', serif;">
                                     </div>
                                 </div>
                             </div>
@@ -797,7 +1049,8 @@
         </div>
     </main>
 
-    <script src="Layout/Template/bibliotecas/bootstrap/js/bootstrap.bundle.min.js" defer></script>
+    <script src="Layout/Template/bibliotecas/bootstrap/js/bootstrap.bundle.min.js" defer=""></script>
+
 </body>
 
 </html>
