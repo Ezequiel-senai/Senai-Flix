@@ -132,18 +132,16 @@
         </nav>
     </header>
 
-   <main class="pb-10" data-bs-spy="scroll" data-bs-offset="0">
+   <main class="pb-1" data-bs-spy="scroll" data-bs-offset="0">
 
         <div id="senai-player-wrapper" class="position-relative ">
 
             <!-- Header Hero Section -->
             <div class="hero-section">
-                <img id="heroLogo" src="/Layout/Template/img/logo_senai.svg" alt="Logo SENAI">
+               
 
                 <div class="hero-video-container" id="heroVideoContainer">
-                    <video id="heroVideo" autoplay muted loop playsinline
-                       >
-                    </video>
+                    <video id="heroVideo" autoplay muted loop playsinline></video>
                 </div>
 
                 <button id="muteBtn" onclick="toggleMute()">🔇</button>
@@ -151,14 +149,13 @@
                 <div class="hero-gradient" id="heroGradient"></div>
 
                 <div class="hero-content" id="heroContent">
+                    <img class="py-5" id="heroLogo" src="./Layout//Template/img/logo_senai.svg" alt="Logo SENAI">
                     <h1 class="text-white">
                         FUNDAMENTOS DA<br>ELETROELETRÔNICA
                     </h1>
-
                     <div class="hero-meta">
-                        <span class="badge-free">2 Situações de Aprendizagem</span>
+                        <span class="badge text-bg-danger text-white" style="color: white !important;">2 Situações de Aprendizagem</span>
                     </div>
-
                     <p class="text-white">
                         A base de tudo. Domine tensão, corrente e resistência para diagnosticar falhas reais. Onde a
                         teoria encontra a prática industrial.
@@ -169,7 +166,6 @@
                             <span class="text-black"> <i class='bx bx-play text-black' title="play"></i></span> <span class="text-black"
                                 id="heroPlayBtnText">Começar</span>
                         </button>
-
                     </div>
                     <!-- Botão Fullscreen Relocado -->
                     <div class="mt-4">
@@ -185,9 +181,9 @@
 
             <!-- Configuração de Vídeos de Fundo (Semântica HTML) -->
             <section class="backgroundVideos" style="display: none;">
-                <a id="s1" href="https://redirect.sp.senai.br/lk.php?link=1077774422758692dbce9402d0"></a>
+                <a id="s1" href="https://www.youtube.com/embed/jmLLKZxzEno?si=c9TKjYL27v7MeY06"></a>
                 <a id="s2"
-                    href="https://play.sesisenai.videolib.live/index.html?token=3fbb194fabd54888a47887e71a63d5ca"></a>
+                    href="https://play.sesisenai.videolib.live/player?token=3fbb194fabd54888a47887e71a63d5ca"></a>
             </section>
 
             <!-- Dados dos Episódios (Semântica HTML) -->
@@ -268,7 +264,7 @@
                     <div class="formula">Q = n . e</div>
                 </div>
 
-                <div id="s1e2" data-sa="s1" data-num="2" data-type="mesacast"
+                <div id="s1e2" data-sa="s1" data-num="2" data-type="mesacast" data-ytid="f-5yV67-o8M"
                     data-interacoes='[{"tempo":9,"titulo":"Definição","pergunta":"A Tensão Elétrica é a pressão que empurra os elétrons no circuito?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto! Sem essa pressão (DDP), não há fluxo de cargas."},{"texto":"Falso","correta":false,"msg":"Incorreto. A voltagem atua como a pressão em um sistema hidráulico."}]},{"tempo":22,"titulo":"Medição","pergunta":"Para medir tensão, o multímetro deve estar em série com a carga?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Errado. Tensão se mede sempre em PARALELO."},{"texto":"Falso","correta":true,"msg":"Boa! Medimos tensão em paralelo para captar a diferença de potencial."}]}]'>
                     <h1 class="title">Tensão Elétrica (DDP)</h1>
                     <span class="duration">47 min</span>
@@ -312,7 +308,7 @@
                     </div>
                     <div class="formula">V = W / Q</div>
                 </div>
-                <div id="s1e3" data-sa="s1" data-num="3" data-type="podcast"
+                <div id="s1e3" data-sa="s1" data-num="3" data-type="podcast" data-ytid="k7C96T9X4A4"
                     data-interacoes='[{"tempo":11,"titulo":"Unidade","pergunta":"Qual é a unidade de medida da intensidade da corrente elétrica?","opcoes":[{"texto":"Ohm (Ω)","correta":false,"msg":"Ohm mede a resistência."},{"texto":"Ampere (A)","correta":true,"msg":"Excelente! O Ampere mede a taxa de fluxo de carga."}]},{"tempo":28,"titulo":"Sentido","pergunta":"No sentido convencional, a corrente flui do Positivo (+) para o Negativo (-)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto. Este é o padrão usado em todos os esquemas elétricos."},{"texto":"Falso","correta":false,"msg":"Na verdade, embora o sentido real seja dos elétrons, o convencional é do + para o -."}]}]'>
                     <h1 class="title">Corrente Elétrica</h1>
                     <span class="duration">52 min</span>
@@ -353,7 +349,7 @@
                     </div>
                     <div class="formula">I = V / R</div>
                 </div>
-                <div id="s1e4" data-sa="s1" data-num="4" data-type="video"
+                <div id="s1e4" data-sa="s1" data-num="4" data-type="video" data-ytid="f-5yV67-o8M"
                     data-interacoes='[{"tempo":14,"titulo":"Geometria","pergunta":"Quanto mais grosso for um fio (maior área), maior será sua resistência?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Erro. Fios mais grossos têm MENOR resistência."},{"texto":"Falso","correta":true,"msg":"Exato! Um fio mais largo oferece menos oposição ao fluxo."}]},{"tempo":32,"titulo":"Material","pergunta":"A unidade de medida da resistência elétrica é o Ohm (Ω)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Isso mesmo, em homenagem a Georg Simon Ohm."},{"texto":"Falso","correta":false,"msg":"Errado. O Ohm é a unidade padrão de resistência."}]}]'>
                     <h1 class="title">Resistência Elétrica</h1>
                     <span class="duration">45 min</span>
@@ -472,7 +468,7 @@
                 </div>
 
                 <!-- SA2: ELETRÔNICA -->
-                <div id="s2e1" data-sa="s2" data-num="1" data-type="podcast"
+                <div id="s2e1" data-sa="s2" data-num="1" data-type="podcast" data-ytid="k7C96T9X4A4"
                     data-interacoes='[{"tempo":13,"titulo":"Frequência","pergunta":"No Brasil, a frequência da Corrente Alternada é de 60 ciclos por segundo (60Hz)?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Correto! Este é o padrão nacional de distribuição."},{"texto":"Falso","correta":false,"msg":"Errado. No Brasil adotamos o padrão de 60Hz."}]},{"tempo":26,"titulo":"Eficaz","pergunta":"O valor de 127V ou 220V que lemos no multímetro é o valor de Pico da onda?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Incorreto. Multímetros mostram o valor eficaz (RMS). O pico é maior."},{"texto":"Falso","correta":true,"msg":"Muito bem! Lemos o valor RMS; o pico chega a ser ~41% maior."}]}]'>
                     <h1 class="title">Corrente Alternada (CA)</h1>
                     <span class="duration">55 min</span>
@@ -510,7 +506,7 @@
                     </div>
                     <div class="formula">f = 1 / T</div>
                 </div>
-                <div id="s2e2" data-sa="s2" data-num="2" data-type="video"
+                <div id="s2e2" data-sa="s2" data-num="2" data-type="video" data-ytid="f-5yV67-o8M"
                     data-interacoes='[{"tempo":8,"titulo":"Pólos","pergunta":"Em magnetismo, pólos iguais se atraem e opostos se repelem?","opcoes":[{"texto":"Verdadeiro","correta":false,"msg":"Errado. A regra é opostos se atraem, iguais se repelem."},{"texto":"Falso","correta":true,"msg":"Correto! Opostos se atraem (Norte atrai Sul)."}]},{"tempo":24,"titulo":"Materiais","pergunta":"O ferro e o níquel são considerados materiais ferromagnéticos?","opcoes":[{"texto":"Verdadeiro","correta":true,"msg":"Isso! Eles são fortemente influenciados por campos magnéticos."},{"texto":"Falso","correta":false,"msg":"Incorreto. Ferro e níquel são os principais exemplos de materiais ferromagnéticos."}]}]'>
                     <h1 class="title">Magnetismo</h1>
                     <span class="duration">48 min</span>

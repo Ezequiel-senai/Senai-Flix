@@ -63,7 +63,16 @@ window.nextEpisodeTimer = null;
 window.interactivePlayerInstance = null;
 
 function updateHeroButton() {
-    const lastPlayed = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastPlayedEpisode') : localStorage.getItem('lastPlayedEpisode');
+    let lastPlayed = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastPlayedEpisode') : localStorage.getItem('lastPlayedEpisode');
+
+    // Se não tem lastPlayed mas tem vídeos marcados como assistidos, pega o último assistido
+    if (!lastPlayed) {
+        let watched = JSON.parse(localStorage.getItem('watchedVideos') || '[]');
+        if (watched.length > 0) {
+            lastPlayed = watched[watched.length - 1];
+        }
+    }
+
     const heroBtnText = document.getElementById('heroPlayBtnText');
     const heroBtnIcon = document.querySelector('#heroPlayBtn i');
 
@@ -706,34 +715,61 @@ const TYPE_LABELS = {
 // --- LÓGICA DO PLAYER ---
 function toggleMute() {
     const video = document.getElementById('heroVideo');
+    const iframe = document.querySelector('#heroVideoContainer iframe');
     const btn = document.getElementById('muteBtn');
     const content = document.getElementById('heroContent');
     const gradient = document.getElementById('heroGradient');
     const logo = document.getElementById('heroLogo');
 
-    if (video.muted) {
-        // UNMUTE: Som LIGADO -> REINICIA O VÍDEO
-        video.currentTime = 0;
-        video.muted = false;
-
-        btn.innerHTML = '🔊';
-        btn.style.backgroundColor = 'rgba(255,255,255,0.9)';
-        btn.style.color = '#000';
-
-        content.style.opacity = '0';
-        gradient.style.opacity = '0';
-        logo.style.opacity = '0';
-    } else {
-        // MUTE: Som DESLIGADO
-        video.muted = true;
-        btn.innerHTML = '🔇';
-        btn.style.backgroundColor = 'rgba(20,20,20,0.6)';
-        btn.style.color = '#fff';
-
-        content.style.opacity = '1';
-        gradient.style.opacity = '1';
-        logo.style.opacity = '1';
+    if (typeof window.heroIsMuted === 'undefined') {
+        window.heroIsMuted = true;
     }
+
+    const toggleState = (isMuted) => {
+        if (!isMuted) {
+            btn.innerHTML = '🔊';
+            btn.style.backgroundColor = 'rgba(255,255,255,0.9)';
+            btn.style.color = '#000';
+            if (content) content.style.opacity = '0';
+            if (gradient) gradient.style.opacity = '0';
+            if (logo) logo.style.opacity = '0';
+        } else {
+            btn.innerHTML = '🔇';
+            btn.style.backgroundColor = 'rgba(20,20,20,0.6)';
+            btn.style.color = '#fff';
+            if (content) content.style.opacity = '1';
+            if (gradient) gradient.style.opacity = '1';
+            if (logo) logo.style.opacity = '1';
+        }
+    };
+
+    if (video) {
+        if (video.muted) {
+            video.currentTime = 0;
+            video.muted = false;
+            window.heroIsMuted = false;
+        } else {
+            video.muted = true;
+            window.heroIsMuted = true;
+        }
+    } else if (iframe) {
+        const url = iframe.src;
+        window.heroIsMuted = !window.heroIsMuted;
+
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            const data = window.heroIsMuted ? '{"event":"command","func":"mute","args":""}' : '{"event":"command","func":"unMute","args":""}';
+            iframe.contentWindow.postMessage(data, '*');
+            if (!window.heroIsMuted) {
+                iframe.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[0, true]}', '*');
+                iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            }
+        } else if (url.includes('videolib.live')) {
+            const data = window.heroIsMuted ? '{"method":"setVolume", "value":0}' : '{"method":"setVolume", "value":1}';
+            iframe.contentWindow.postMessage(data, '*');
+        }
+    }
+
+    toggleState(window.heroIsMuted);
 }
 
 function changeSeason() {
@@ -769,16 +805,26 @@ function changeSeason() {
                 // Origin é fundamental para permitir autoplay via JS API
                 const origin = (window.location.origin && window.location.origin !== "null") ? `&origin=${encodeURIComponent(window.location.origin)}` : "";
                 params += `&playlist=${videoId}${origin}`;
-            } else if (url.includes('videolib.live') || url.includes('redirect.sp.senai.br')) {
+            } else if (url.includes('videolib.live')) {
+                // Para links do Videolib, garantir que autoplay e muted estejam como true
                 params = `autoplay=true&muted=true&mute=true&loop=true&controls=false&background=true`;
+            } else if (url.includes('redirect.sp.senai.br')) {
+                // SENAI Redirect geralmente vai para YouTube ou Videolib
+                // Adicionamos autoplay=1 para YouTube e autoplay=true para Videolib (ambos costumam funcionar)
+                params = `autoplay=1&autoplay=true&muted=1&muted=true&mute=1&loop=1&controls=0&background=1`;
             }
 
             iframe.src = `${embedUrl}${separator}${params}`;
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
+
+            // Estilos para fazer o iframe funcionar como object-fit: cover e remover margens pretas
+            iframe.style.width = '100vw';
+            iframe.style.height = '56.25vw'; /* 16:9 Aspect Ratio */
+            iframe.style.minHeight = '100vh';
+            iframe.style.minWidth = '177.77vh'; /* 16:9 Aspect Ratio */
             iframe.style.position = 'absolute';
-            iframe.style.top = '0';
-            iframe.style.left = '0';
+            iframe.style.top = '50%';
+            iframe.style.left = '50%';
+            iframe.style.transform = 'translate(-50%, -50%)';
             iframe.style.border = 'none';
             iframe.style.pointerEvents = 'none';
             // Atributo essencial para permitir autoplay em iframes
@@ -1203,7 +1249,15 @@ function closeVideoPlayer() {
 }
 
 function playFirstEpisode() {
-    const lastPlayed = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastPlayedEpisode') : localStorage.getItem('lastPlayedEpisode');
+    let lastPlayed = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastPlayedEpisode') : localStorage.getItem('lastPlayedEpisode');
+
+    if (!lastPlayed) {
+        let watched = JSON.parse(localStorage.getItem('watchedVideos') || '[]');
+        if (watched.length > 0) {
+            lastPlayed = watched[watched.length - 1];
+        }
+    }
+
     if (lastPlayed) {
         openVideoPlayer(lastPlayed);
     } else {

@@ -1935,7 +1935,7 @@ Imagem gerada por IA
   padding: 0;
   width: 100%;
   overflow-x: hidden;
-  border-radius: 4px;
+  /* border-radius: 4px; */
   position: relative;
   zoom: 1;
 }
@@ -2186,40 +2186,17 @@ body.theme-2 #senai-player-wrapper {
 
 .hero-section {
   position: relative;
-  height: 650px;
+  height: 750px;
   display: flex;
   align-items: center;
   overflow: hidden;
   background-color: #000;
+  /* Força largura total da tela, ignorando margens do elemento pai */
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
 }
 
-#heroLogo {
-  position: absolute;
-  top: 50px;
-  left: 5%;
-  margin-left: -15px;
-  width: 180px;
-  z-index: 100;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
-  transition: opacity 0.5s ease;
-}
 
-.hero-video-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-#heroVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-  opacity: 0.6;
-}
 
 #muteBtn {
   position: absolute;
@@ -2335,6 +2312,8 @@ body.theme-2 #senai-player-wrapper {
 .hero-buttons button span:first-child {
   font-size: 1.4rem;
 }
+
+
 
 #detailsModal>div {
   width: 90%;
@@ -2514,14 +2493,7 @@ body.theme-2 #senai-player-wrapper {
 }
 
 #heroLogo {
-  position: absolute;
-  top: 50px;
-  left: 5%;
-  margin-left: -15px;
   width: 180px;
-  z-index: 100;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
-  transition: opacity 0.5s ease;
 }
 
 #heroVideo {
@@ -2535,24 +2507,7 @@ body.theme-2 #senai-player-wrapper {
   opacity: 0.6;
 }
 
-#muteBtn {
-  position: absolute;
-  bottom: 100px;
-  right: 5%;
-  z-index: 101;
-  background-color: rgba(20, 20, 20, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  color: var(--text1);
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  transition: all 0.2s;
-}
+
 
 #heroGradient {
   position: absolute;
@@ -2560,7 +2515,7 @@ body.theme-2 #senai-player-wrapper {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to top, #141414 5%, transparent 95%), linear-gradient(to right, #141414 0%, rgba(20, 20, 20, 0.5) 50%, transparent 100%);
+  background: linear-gradient(to top, #000000 5%, transparent 40%), linear-gradient(to right, #141414 0%, rgba(20, 20, 20, 0.5) 50%, transparent 100%);
   z-index: 1;
   transition: opacity 0.5s ease;
 }
@@ -2620,7 +2575,7 @@ body.theme-2 #senai-player-wrapper {
   color: var(--text1);
   font-weight: 900;
   padding: 4px 8px;
-  border-radius: 4px;
+  /* border-radius: 4px; */
   font-size: 0.9rem;
 }
 
@@ -2711,6 +2666,9 @@ section select {
   background-color: var(--bg-hover-destaque);
 }
 
+.episode-num {
+  color: var(--text1) !important;
+}
 /* Hover específico para Tema Claro */
 .theme-1 .episode-row:hover h5,
 .theme-1 .episode-row:hover p,
@@ -3583,11 +3541,9 @@ i.bx-play-circle,
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    
     display: flex;
     align-items: center;
     justify-content: center;
-    
     color: white;
     background: transparent;
     border: none;

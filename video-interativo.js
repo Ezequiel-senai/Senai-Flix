@@ -109,10 +109,10 @@ class VideoInterativoUniversal {
         // Detectar tipo de URL
         if (this.isYouTubeUrl(url)) {
             this.loadYouTube(url);
+        } else if (this.isVideolibPlayer(url) || this.isSenaiRedirect(url)) {
+            this.loadIframe(url);
         } else if (this.isHlsUrl(url)) {
             this.loadHLS(url);
-        } else if (this.isSenaiRedirect(url)) {
-            this.loadIframe(url);
         } else {
             this.loadDirect(url);
         }
@@ -123,7 +123,13 @@ class VideoInterativoUniversal {
     }
 
     isHlsUrl(url) {
+        // Se contém index.html e videolib, é link do player, não do manifesto
+        if (url.includes('videolib') && url.includes('index.html')) return false;
         return /\.m3u8|videolib|cdn.*hls/.test(url);
+    }
+
+    isVideolibPlayer(url) {
+        return /videolib.*index\.html/.test(url);
     }
 
     isSenaiRedirect(url) {
@@ -134,10 +140,22 @@ class VideoInterativoUniversal {
         console.log('Carregando via iframe (fallback):', url);
         this.video.style.display = 'none';
         
+        let finalUrl = url;
+        if (this.config.autoplay) {
+            const separator = finalUrl.includes('?') ? '&' : '?';
+            if (this.isSenaiRedirect(finalUrl)) {
+                finalUrl += `${separator}autoplay=1&autoplay=true`;
+            } else if (this.isVideolibPlayer(finalUrl)) {
+                finalUrl += `${separator}autoplay=true`;
+            }
+        }
+
         const iframe = document.createElement('iframe');
-        iframe.src = url;
+        iframe.src = finalUrl;
         iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;';
         iframe.allowFullscreen = true;
+        // Atributo essencial para permitir autoplay em iframes
+        iframe.allow = "autoplay; fullscreen";
         
         this.wrapper.insertBefore(iframe, this.wrapper.firstChild);
         
