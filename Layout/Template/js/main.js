@@ -674,14 +674,35 @@ function syncEpisodesFromHTML() {
 
     window.episodesData = [];
     epContainer.querySelectorAll('[id]').forEach(epEl => {
-        let rawInterations = epEl.getAttribute('data-interacoes');
-        let parsedInteractions = [];
-        try {
-            if (rawInterations) {
-                parsedInteractions = JSON.parse(rawInterations);
-            }
-        } catch (e) {
-            console.error(`Erro ao processar interações para o episódio ${epEl.id}:`, e);
+        // Busca interações a partir dos elementos HTML filhos
+        const interactiveQuestions = epEl.querySelector('.interactive-questions');
+        const parsedInteractions = [];
+        
+        if (interactiveQuestions) {
+            interactiveQuestions.querySelectorAll('.interacao').forEach(intEl => {
+                const tempo = parseInt(intEl.getAttribute('data-tempo')) || 0;
+                const titulo = intEl.getAttribute('data-titulo') || '';
+                const tipo = intEl.getAttribute('data-tipo') || 'single';
+                const msgFeedbackGeral = intEl.getAttribute('data-msg') || '';
+                const pergunta = intEl.querySelector('.pergunta')?.innerHTML || '';
+                
+                const opcoes = [];
+                intEl.querySelectorAll('.opcoes .opcao').forEach(optEl => {
+                    opcoes.push({
+                        texto: optEl.innerText.trim(),
+                        correta: optEl.getAttribute('data-correta') === 'true',
+                        msg: optEl.getAttribute('data-msg') || msgFeedbackGeral
+                    });
+                });
+
+                parsedInteractions.push({
+                    tempo: tempo,
+                    titulo: titulo,
+                    tipo: tipo,
+                    pergunta: pergunta,
+                    opcoes: opcoes
+                });
+            });
         }
 
         const ep = {
@@ -700,7 +721,7 @@ function syncEpisodesFromHTML() {
             ytid: epEl.getAttribute('data-ytid') || null,
             interacoes: parsedInteractions
         };
-        console.log(`[syncEpisodesFromHTML] ${ep.id}: ${parsedInteractions.length} interações`);
+        console.log(`[syncEpisodesFromHTML] ${ep.id}: ${parsedInteractions.length} interações encontradas`);
         window.episodesData.push(ep);
     });
 }

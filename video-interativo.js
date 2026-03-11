@@ -24,6 +24,7 @@ class VideoInterativoUniversal {
         this.isLocked = false;
         this.isIframeMode = false;
         this.manualDuration = 0;
+        this._progressRestored = false;
         
         // Define chave única para persistência (SCORM/Local)
         // Prioriza videoId, depois containerId (fallback)
@@ -44,9 +45,15 @@ class VideoInterativoUniversal {
         const container = document.getElementById(this.config.containerId);
         if (!container) return;
 
+        // Verificar se existe um container externo para a navegação de capítulos (melhor para mobile)
+        const externalNav = document.getElementById('chapterNavWrapper');
+        if (externalNav) {
+            externalNav.innerHTML = '<div class="chapter-nav" id="chapterNav"></div>';
+        }
+
         container.innerHTML = `
             <div class="video-wrapper" id="videoWrapper">
-                <video id="videoPlayer" playsinline></video>
+                <video id="videoPlayer" playsinline preload="auto" crossorigin="anonymous"></video>
                 <div class="material-icons big-play-icon " id="bigPlayIcon">play_circle_filled</div>
 
                 <div class="custom-controls" id="controlsBar">
@@ -74,9 +81,7 @@ class VideoInterativoUniversal {
                     </div>
                 </div>
             </div>
-        </div>
-
-            <div class="chapter-nav" id="chapterNav"></div>
+            ${!externalNav ? '<div class="chapter-nav" id="chapterNav"></div>' : ''}
         `;
 
         this.wrapper = document.getElementById('videoWrapper');
@@ -96,10 +101,12 @@ class VideoInterativoUniversal {
         // Detectar tipo de URL
         if (this.isYouTubeUrl(url)) {
             this.loadYouTube(url);
-        } else if (this.isVideolibPlayer(url) || this.isSenaiRedirect(url)) {
-            this.loadIframe(url);
         } else if (this.isHlsUrl(url)) {
             this.loadHLS(url);
+        } else if (this.isDashUrl(url)) {
+            this.loadDash(url);
+        } else if (this.isVideolibPlayer(url) || this.isSenaiRedirect(url)) {
+            this.loadIframe(url);
         } else {
             this.loadDirect(url);
         }
@@ -110,9 +117,16 @@ class VideoInterativoUniversal {
     }
 
     isHlsUrl(url) {
+        if (!url) return false;
+        const lowerUrl = url.toLowerCase();
         // Se contém index.html e videolib, é link do player, não do manifesto
-        if (url.includes('videolib') && url.includes('index.html')) return false;
-        return /\.m3u8|videolib|cdn.*hls/.test(url);
+        if (lowerUrl.includes('videolib') && lowerUrl.includes('player')) return false;
+        if (lowerUrl.includes('videolib') && lowerUrl.includes('index.html')) return false;
+        return /\.m3u8($|\?)|cdn.*hls/i.test(url) || (lowerUrl.includes('videolib') && lowerUrl.includes('manifest'));
+    }
+
+    isDashUrl(url) {
+        return /\.mpd/.test(url);
     }
 
     isVideolibPlayer(url) {
@@ -276,35 +290,195 @@ class VideoInterativoUniversal {
     }
 
     loadHLS(url) {
+        console.log('Iniciando carga HLS:', url);
+        if (this.video) this.video.style.display = 'block';
+
+        let retryCount = 0;
+        const maxRetries = 3;
+
         if (window.Hls && window.Hls.isSupported()) {
             if (this.hls) this.hls.destroy();
             
-            this.hls = new window.Hls();
+            // Pega os parâmetros da URL (SAS Token da Azure) para propagar nos fragmentos
+            const urlObj = new URL(url);
+            const token = urlObj.search; // ex: "?sv=..."
+
+            this.hls = new window.Hls({
+                debug: false,
+                enableWorker: true, // Melhora performance e evita travar UI
+                backBufferLength: 60,
+                maxBufferLength: 30,
+                maxMaxBufferLength: 600,
+                appendErrorMaxRetry: 20,
+                manifestLoadingMaxRetry: 10,
+                levelLoadingMaxRetry: 10,
+                fragLoadingMaxRetry: 10,
+                xhrSetup: (xhr, requestUrl) => {
+                    // Opcional: headers adicionais se necessário
+                }
+            });
+
+            const appendToken = (targetUrl) => {
+                if (!token || !targetUrl) return targetUrl;
+                // Prevenir duplicação se o token já estiver na URL
+                if (targetUrl.includes(token.substring(1))) return targetUrl;
+                
+                const separator = targetUrl.includes('?') ? '&' : '?';
+                // Remove o '?' inicial do token para anexar com o separador correto
+                return targetUrl + separator + token.substring(1);
+            };
+
+            // Melhor abordagem para propagação de token em Azure HLS:
+            this.hls.on(window.Hls.Events.LEVEL_LOADING, (event, data) => {
+                if (data.url) data.url = appendToken(data.url);
+            });
+            this.hls.on(window.Hls.Events.FRAG_LOADING, (event, data) => {
+                if (data.frag && data.frag.url) {
+                    data.frag.url = appendToken(data.frag.url);
+                }
+            });
+            this.hls.on(window.Hls.Events.KEY_LOADING, (event, data) => {
+                if (data.frag && data.frag.url) {
+                    data.frag.url = appendToken(data.frag.url);
+                }
+            });
+            this.hls.on(window.Hls.Events.SUBTITLE_TRACK_LOADING, (event, data) => {
+                if (data.url) data.url = appendToken(data.url);
+            });
+            // Adicionado para chaves de criptografia e legendas
+            this.hls.on(window.Hls.Events.KEY_LOADING, (event, data) => {
+                if (token && data.frag && data.frag.url && !data.frag.url.includes('?')) {
+                    data.frag.url += token;
+                }
+            });
+            this.hls.on(window.Hls.Events.SUBTITLE_TRACK_LOADING, (event, data) => {
+                if (token && data.url && !data.url.includes('?')) {
+                    data.url += token;
+                }
+            });
+
             this.hls.loadSource(url);
             this.hls.attachMedia(this.video);
+
+            // Ouvinte de Erros HLS
+            this.hls.on(window.Hls.Events.ERROR, (event, data) => {
+                if (this.isDestroyed) return;
+                console.warn("HLS Error:", data.type, data.details, data.response?.code);
+
+                if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR) {
+                    if (data.response?.code === 409 || data.response?.code === 404) {
+                        retryCount++;
+                        if (retryCount <= maxRetries) {
+                            console.log(`Tentando recuperar do erro ${data.response.code} (tentativa ${retryCount}/${maxRetries})...`);
+                            // Espera um pouco antes de tentar novamente para evitar "recharge" infinito visual
+                            setTimeout(() => {
+                                if (this.isDestroyed || !this.hls) return;
+                                this.hls.startLoad();
+                            }, 2000);
+                            return;
+                        } else {
+                            console.error("Máximo de tentativas HLS atingido. Fallback para carga direta.");
+                            this.hls.destroy();
+                            this.loadDirect(url);
+                        }
+                    } else if (data.fatal) {
+                        this.hls.startLoad();
+                    }
+                } else if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
+                    console.error("Erro de mídia HLS fatal, tentando recuperar...");
+                    if (data.fatal) this.hls.recoverMediaError();
+                } else if (data.details === window.Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+                    console.warn("Flush de buffer detectado (Stall). Tentando recuperar posição...");
+                    if (this.video && !this.video.paused) {
+                        // Tenta dar um pequeno empurrão
+                        this.video.currentTime += 0.2;
+                        setTimeout(() => {
+                            if (this.isDestroyed || !this.hls) return;
+                            if (this.video.paused && !this.isLocked) this.hls.startLoad();
+                        }, 1000);
+                    }
+                } else if (data.details === window.Hls.ErrorDetails.FRAG_LOAD_ERROR) {
+                    console.warn("Falha ao carregar fragmento. Tentando recuperar carga...");
+                    if (data.fatal) this.hls.startLoad();
+                } else if (data.details === window.Hls.ErrorDetails.LEVEL_LOAD_ERROR) {
+                    console.warn("Erro ao carregar nível/playlist. Tentando novamente...");
+                    if (data.fatal) this.hls.startLoad();
+                } else if (data.fatal) {
+                   console.error("Erro HLS fatal irrecuperável:", data);
+                   this.hls.destroy();
+                   this.loadDirect(url);
+                }
+            });
+
             this.hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+                if (this.isDestroyed) return;
                 this.onHLSReady();
+                // Tenta play imediato se configurado
+                if (this.config.autoplay) {
+                    setTimeout(() => {
+                        if (this.isDestroyed || !this.video) return;
+                        this.video.play().catch(e => {
+                            console.warn("Autoplay HLS bloqueado, aguardando clique:", e);
+                            this.wrapper.classList.add('paused');
+                        });
+                    }, 500);
+                }
             });
         } else if (this.video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Suporte nativo (Safari/iOS)
             this.video.src = url;
-            this.video.onloadedmetadata = () => this.onHLSReady();
+            this.video.onloadedmetadata = () => {
+                this.onHLSReady();
+                if (this.config.autoplay) {
+                    this.video.play().catch(e => console.warn("Autoplay Nativo bloqueado:", e));
+                }
+            };
+        } else {
+            console.error('HLS não suportado neste navegador.');
+            this.loadDirect(url);
         }
     }
 
     onHLSReady() {
-        console.log('HLS/Videolib carregado');
+        console.log('HLS Pronto');
         this.setupTimeline();
-        this.restoreProgress(); // Adicionado para persistência
+        this.restoreProgress();
         this.updateTime();
     }
 
     loadDirect(url) {
-        this.video.src = url;
-        this.video.onloadedmetadata = () => {
-            this.setupTimeline();
-            this.restoreProgress(); // Adicionado para persistência
-            this.updateTime();
-        };
+        if (this.video) {
+            this.video.style.display = 'block';
+            this.video.src = url;
+            this.video.onloadedmetadata = () => {
+                this.setupTimeline();
+                this.restoreProgress();
+                this.updateTime();
+                if (this.config.autoplay) {
+                    this.video.play().catch(e => console.warn("Autoplay Direto bloqueado:", e));
+                }
+            };
+        }
+    }
+
+    loadDash(url) {
+        console.log('Carregando via DASH (Shaka Player):', url);
+        // Verifica se o Shaka Player está disponível
+        if (window.shaka) {
+            shaka.polyfill.installAll();
+            if (shaka.Player.isBrowserSupported()) {
+                const player = new shaka.Player(this.video);
+                player.load(url).then(() => {
+                    console.log('DASH carregado com sucesso');
+                    this.onHLSReady(); // Reutiliza a lógica de "vídeo carregado"
+                }).catch(e => console.error('Erro ao carregar DASH:', e));
+            } else {
+                console.error('Navegador não suporta Shaka Player');
+            }
+        } else if (this.isIframeMode === false) {
+            console.warn('Shaka Player não detectado. Tentando carregar direto...');
+            this.loadDirect(url);
+        }
     }
 
     setupControls() {
@@ -491,29 +665,39 @@ class VideoInterativoUniversal {
             this.youtubePlayer.getDuration() : 
             (this.video ? this.video.duration : 0);
 
-        if (!duration || duration === 0) {
-            // TENTA BUSCAR DURAÇÃO DO HTML SE DISPONÍVEL (FALLBACK PARA IFRAMES/ESTADOS INICIAIS)
-            // Tenta por: id do episódio, data-ytid do episódio
+        if (!duration || duration === 0 || isNaN(duration) || duration === Infinity) {
+            // TENTA BUSCAR DURAÇÃO DO HTML SE DISPONÍVEL (FALLBACK TEMPORÁRIO)
             const videoId = this.config.videoId;
             const epEl = document.getElementById(videoId) ||
                 document.querySelector(`[data-ytid="${videoId}"]`);
 
-            if (epEl) {
+            if (epEl && !this._triedManualDuration) {
                 const durStr = epEl.querySelector('.duration')?.innerText;
                 if (durStr && durStr.includes('min')) {
                     this.manualDuration = parseInt(durStr) * 60;
-                    console.log(`Usando duração manual do HTML: ${this.manualDuration}s`);
+                    console.log(`Usando duração manual temporária: ${this.manualDuration}s`);
                     this.renderMarkers(this.manualDuration);
-                    return;
+                    this._lastRenderedDuration = this.manualDuration;
+                    this._triedManualDuration = true;
                 }
             }
 
-            // Se a duração ainda não estiver disponível, tentar novamente em breve
-            console.log('setupTimeline: duração ainda não disponível, tentando em 1s...');
-            setTimeout(() => this.setupTimeline(), 1000);
+            // CONTINUA TENTANDO BUSCAR A REAL (não retorna se usou a manual)
+            if (this._timelinePoll) clearTimeout(this._timelinePoll);
+            this._timelinePoll = setTimeout(() => this.setupTimeline(), 1000);
             return;
         }
 
+        // Se a duração real é muito parecida com a que já renderizamos, não faz nada (evita flicker)
+        if (this._lastRenderedDuration && Math.abs(this._lastRenderedDuration - duration) < 2) {
+            if (this._timelinePoll) clearTimeout(this._timelinePoll);
+            return;
+        }
+
+        // Se chegamos aqui, temos a duração REAL. Cancela polling e renderiza.
+        if (this._timelinePoll) clearTimeout(this._timelinePoll);
+        console.log(`Padrão de duração real encontrado: ${duration}s. Re-renderizando markers.`);
+        this._lastRenderedDuration = duration;
         this.renderMarkers(duration);
     }
 
@@ -609,7 +793,14 @@ class VideoInterativoUniversal {
                 }
 
                 if (!finalDuration) return;
-                const targetTime = pos * finalDuration;
+                
+                let targetTime = pos * finalDuration;
+                
+                // Clamping de segurança para evitar pular além do fim do vídeo real
+                const realDuration = this.youtubePlayer ? this.youtubePlayer.getDuration() : (this.video ? this.video.duration : 0);
+                if (realDuration > 0 && !isNaN(realDuration) && realDuration !== Infinity) {
+                    targetTime = Math.min(targetTime, realDuration - 0.5);
+                }
 
                 // Verificar se há perguntas não respondidas no caminho do salto para frente
                 if (targetTime > currentTime) {
@@ -757,15 +948,15 @@ class VideoInterativoUniversal {
 
         // Injetar o HTML baseado no js-exercise
         interactiveOverlay.innerHTML = `
-            <div class="row py-3 js-exercise w-100 h-100 d-flex align-items-center justify-content-center" data-type="single" style="margin: 0; padding: 20px;">
-                <div class="col-lg-8 mx-auto py-5 border rounded" style="  background-color: var(--bg-primary); box-shadow: 0 10px 40px rgba(0,0,0,0.5); border-radius: 12px; margin-top: 5vh; max-height: 80vh; overflow-y: auto;">
+            <div class="row py-3 js-exercise w-100 h-100 d-flex align-items-center justify-content-center" data-type="single" style="margin: 0; padding: 20px; position: absolute; top:0; left:0; z-index: 1000;">
+                <div class="col-lg-8 mx-auto py-5 border rounded" style="background-color: var(--bg-primary, #ffffff); box-shadow: 0 10px 40px rgba(0,0,0,0.5); border-radius: 12px; margin-top: 5vh; max-height: 80vh; overflow-y: auto;">
                     <div class="m-3 text-center">
-                        <h4 style="color:#222; font-weight:700; margin-bottom: 20px; font-size: 1.5rem;">${dados.pergunta}</h4>
+                        <h4 style="color:#222; font-weight:700; margin-bottom: 20px; font-size: 1.5rem;">${dados.pergunta || 'Responda a questão para continuar'}</h4>
                     </div>
                     <div class="list-group m-3 gap-2" id="qOptionsContainer">
                         ${optionsHtml}
                     </div>
-                    <div class="feedback-container px-3 mt-4" id="qFeedbackContainer" style="display:${feedbackDisplay};">
+                    <div class="feedback-container mt-4" id="qFeedbackContainer" style="display:${feedbackDisplay};">
                         <!-- Feedback Sucesso -->
                         <div class="feedback-correto" id="feedbackSuccess" style="display:${successDisplay};">
                             <div class="alert alert-success d-flex align-items-center p-3" style="font-size: 1.1rem;">
@@ -783,8 +974,8 @@ class VideoInterativoUniversal {
                     </div>
                     
                     <div class="mt-4 d-flex flex-column flex-sm-row justify-content-center gap-3 px-3">
-                        ${!jaRespondida ? `<button id="btnConfirmQuestion" class="btn btn-primary btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:none; max-width: 300px; margin: 0 auto;">Confirmar</button>` : ''}
-                        <button id="btnContinueVideo" class="btn ${jaRespondida ? 'btn-success' : 'btn-primary'} btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:${jaRespondida ? 'inline-block' : 'none'}; max-width: 300px; margin: 0 auto;">Continuar Vídeo <i class="bx bx-play-circle ms-2"></i></button>
+                        ${!jaRespondida ? `<button id="btnConfirmQuestion" class="btn btn-primary text-black btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:none; max-width: 300px; margin: 0 auto;">Confirmar</button>` : ''}
+                        <button id="btnContinueVideo" class="btn ${jaRespondida ? 'btn-success' : 'btn-primary text-black '} btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:${jaRespondida ? 'inline-block' : 'none'}; max-width: 300px; margin: 0 auto;">Continuar Vídeo <i class="bx bx-play-circle ms-2"></i></button>
                     </div>
                 </div>
             </div>
@@ -794,19 +985,30 @@ class VideoInterativoUniversal {
 
         // Elementos interativos
         const btnContinue = interactiveOverlay.querySelector('#btnContinueVideo');
+        const btnConfirm = interactiveOverlay.querySelector('#btnConfirmQuestion');
 
-        // Lógica de Continuar (sempre disponível)
-        if (btnContinue) {
-            btnContinue.addEventListener('click', () => {
-                interactiveOverlay.style.display = 'none';
-                this.isLocked = false;
+        // Lógica de Continuar (Unificada)
+        const handleContinue = () => {
+            interactiveOverlay.style.display = 'none';
+            this.isLocked = false;
 
-                // Retomar o vídeo
-                if (this.youtubePlayer) {
-                    this.youtubePlayer.playVideo();
-                } else if (this.video) {
-                    this.video.play();
+            // Retomar o vídeo de forma robusta
+            if (this.youtubePlayer) {
+                this.youtubePlayer.playVideo();
+            } else if (this.video) {
+                const playPromise = this.video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn("Retomada automática bloqueada:", error);
+                    });
                 }
+            }
+        };
+
+        if (btnContinue) {
+            btnContinue.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleContinue();
             });
         }
 
@@ -815,7 +1017,7 @@ class VideoInterativoUniversal {
 
         // Lógica de Seleção
         const radios = interactiveOverlay.querySelectorAll('input[type="radio"]');
-        const btnConfirm = interactiveOverlay.querySelector('#btnConfirmQuestion');
+        // btnConfirm já declarado no topo do método
 
         radios.forEach(radio => {
             radio.addEventListener('change', () => {
@@ -871,39 +1073,32 @@ class VideoInterativoUniversal {
         const msgError = overlayEl.querySelector('#msgErrorText');
         const btnContinue = overlayEl.querySelector('#btnContinueVideo');
 
-        feedbackContainer.style.display = 'block';
+        if (feedbackContainer) feedbackContainer.style.display = 'block';
 
         if (op.correta) {
-            msgSuccess.innerHTML = op.msg || 'Resposta correta!';
-            fSuccess.style.display = 'block';
-            fError.style.display = 'none';
+            if (msgSuccess) msgSuccess.innerHTML = op.msg || 'Resposta correta!';
+            if (fSuccess) fSuccess.style.display = 'block';
+            if (fError) fError.style.display = 'none';
             // Estilizar opção selecionada como sucesso
-            const selectedLabel = overlayEl.querySelector('input[type="radio"]:checked').closest('label');
-            selectedLabel.style.border = '2px solid #198754';
-            selectedLabel.style.backgroundColor = '#d1e7dd';
+            const selectedLabel = overlayEl.querySelector('input[type="radio"]:checked')?.closest('label');
+            if (selectedLabel) {
+                selectedLabel.style.border = '2px solid #198754';
+                selectedLabel.style.backgroundColor = '#d1e7dd';
+            }
         } else {
-            msgError.innerHTML = op.msg || 'Resposta incorreta.';
-            fError.style.display = 'block';
-            fSuccess.style.display = 'none';
+            if (msgError) msgError.innerHTML = op.msg || 'Resposta incorreta.';
+            if (fError) fError.style.display = 'block';
+            if (fSuccess) fSuccess.style.display = 'none';
             // Estilizar opção selecionada como erro
-            const selectedLabel = overlayEl.querySelector('input[type="radio"]:checked').closest('label');
-            selectedLabel.style.border = '2px solid #dc3545';
-            selectedLabel.style.backgroundColor = '#f8d7da';
+            const selectedLabel = overlayEl.querySelector('input[type="radio"]:checked')?.closest('label');
+            if (selectedLabel) {
+                selectedLabel.style.border = '2px solid #dc3545';
+                selectedLabel.style.backgroundColor = '#f8d7da';
+            }
         }
 
-        btnContinue.style.display = 'inline-block';
-
-        btnContinue.addEventListener('click', () => {
-            overlayEl.style.display = 'none';
-            this.isLocked = false;
-
-            // Retomar o vídeo
-            if (this.youtubePlayer) {
-                this.youtubePlayer.playVideo();
-            } else if (this.video) {
-                this.video.play();
-            }
-        });
+        if (btnContinue) btnContinue.style.display = 'inline-block';
+        // O listener de clique no btnContinue já foi configurado no openQuestion.
     }
 
 
@@ -953,6 +1148,11 @@ class VideoInterativoUniversal {
             if (this.youtubePlayer) {
                 this.youtubePlayer.seekTo(sec);
             } else if (this.video) {
+                // Clamping no jumpTo
+                const realDuration = this.video.duration;
+                if (realDuration && !isNaN(realDuration) && sec > realDuration) {
+                    sec = Math.max(0, realDuration - 0.2);
+                }
                 this.video.currentTime = sec;
             }
             this.openQuestion(this.config.interacoes[interactionIndex], interactionIndex);
@@ -961,9 +1161,15 @@ class VideoInterativoUniversal {
 
         // Comportamento padrão: pular e tocar
         if (this.youtubePlayer) {
+            const yDur = this.youtubePlayer.getDuration();
+            if (yDur) sec = Math.min(sec, yDur - 1);
             this.youtubePlayer.seekTo(sec);
             this.youtubePlayer.playVideo();
         } else if (this.video) {
+            const vDur = this.video.duration;
+            if (vDur && !isNaN(vDur) && vDur !== Infinity) {
+                sec = Math.min(sec, vDur - 0.2);
+            }
             this.video.currentTime = sec;
             this.video.play();
         }
@@ -1018,6 +1224,9 @@ class VideoInterativoUniversal {
     }
 
     restoreProgress() {
+        if (this._progressRestored) return;
+        this._progressRestored = true;
+
         let data = null;
         const vidId = this.config.videoId || 'unknown';
 
@@ -1094,6 +1303,12 @@ class VideoInterativoUniversal {
         console.log('Destruindo player interativo...');
         this.isDestroyed = true;
         
+        // Parar polling de duração
+        if (this._timelinePoll) {
+            clearTimeout(this._timelinePoll);
+            this._timelinePoll = null;
+        }
+
         // Remover listener de teclado
         if (this._keyHandler) {
             window.removeEventListener('keydown', this._keyHandler);
@@ -1133,6 +1348,12 @@ class VideoInterativoUniversal {
         const container = document.getElementById(this.config.containerId);
         if (container) {
             container.innerHTML = '';
+        }
+
+        // Limpar overlay de perguntas
+        const overlay = document.getElementById('interactiveOverlay');
+        if (overlay) {
+            overlay.remove();
         }
     }
 }
