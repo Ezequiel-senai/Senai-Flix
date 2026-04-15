@@ -501,16 +501,21 @@ class VideoInterativoUniversal {
 
         // Play/Pause
         const togglePlay = () => {
-            if (this.isLocked) return;
+            if (this.isLocked || this.isDestroyed) return;
 
-            if (this.youtubePlayer) {
+            if (this.isIframeMode) {
+                console.warn('Controle de Play/Pause não disponível em modo Iframe Fallback.');
+                return;
+            }
+
+            if (this.youtubePlayer && typeof this.youtubePlayer.getPlayerState === 'function') {
                 const state = this.youtubePlayer.getPlayerState();
                 if (state === window.YT.PlayerState.PLAYING) {
                     this.youtubePlayer.pauseVideo();
                 } else {
                     this.youtubePlayer.playVideo();
                 }
-            } else {
+            } else if (this.video) {
                 if (this.video.paused || this.video.ended) {
                     this.video.play();
                 } else {
@@ -832,21 +837,24 @@ class VideoInterativoUniversal {
         const currentTime = this.youtubePlayer ? 
             this.youtubePlayer.getCurrentTime() : 
             (this.video ? this.video.currentTime : 0);
-        const duration = this.youtubePlayer ? 
+        let duration = this.youtubePlayer ? 
             this.youtubePlayer.getDuration() : 
             (this.video ? this.video.duration : 0);
 
-        if (!duration || duration === 0) return;
+        // Fallback para duração manual se a real falhar (ex: iframe ou carregando)
+        const finalDuration = duration || this.manualDuration || 0;
 
-        const pct = (currentTime / duration) * 100;
-        const progressFill = document.getElementById('progressFill');
-        if (progressFill) {
-            progressFill.style.width = pct + '%';
-        }
+        if (finalDuration > 0) {
+            const pct = (currentTime / finalDuration) * 100;
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                progressFill.style.width = pct + '%';
+            }
 
-        const timeDisplay = document.getElementById('timeDisplay');
-        if (timeDisplay) {
-            timeDisplay.innerText = this.formatTime(currentTime) + " / " + this.formatTime(duration);
+            const timeDisplay = document.getElementById('timeDisplay');
+            if (timeDisplay) {
+                timeDisplay.innerText = this.formatTime(currentTime) + " / " + this.formatTime(finalDuration);
+            }
         }
 
         this.checkInteractions();
@@ -1339,25 +1347,17 @@ class VideoInterativoUniversal {
                 this.youtubePlayer.stopVideo();
                 this.youtubePlayer.destroy();
             } catch (e) {
-                console.warn('Erro ao destruir player do YouTube:', e);
+                console.warn('Erro ao destruir YouTube Player:', e);
             }
-            this.youtubePlayer = null;
         }
-
-        // Destruir HLS
-        if (this.hls) {
-            this.hls.destroy();
-            this.hls = null;
-        }
-
-        // Parar vídeo HTML5 se existir
+        
         if (this.video) {
             this.video.pause();
             this.video.src = "";
             this.video.load();
         }
 
-        // Limpar o container HTML para garantir que tudo (iframes, etc) suma
+        // Limpar container
         const container = document.getElementById(this.config.containerId);
         if (container) {
             container.innerHTML = '';

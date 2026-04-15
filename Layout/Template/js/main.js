@@ -66,6 +66,8 @@ function updateWatchedChecks() {
 window.currentVideoUrl = "";
 window.nextEpisodeTimer = null;
 window.interactivePlayerInstance = null;
+window.episodesData = [];
+window.backgroundVideos = {};
 
 function updateHeroButton() {
     let lastPlayed = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastPlayedEpisode') : localStorage.getItem('lastPlayedEpisode');
@@ -1015,7 +1017,7 @@ function renderEpisodes() {
                  <div class="episode-play-overlay" title="${typeLabel}">
                     <span class="episode-play-icon">${iconSvg}</span>
                 </div>
-                <div class="watched-check" style="display: ${isWatched(ep.video) ? 'block' : 'none'};">✓</div>
+                <div class="watched-check" style="display: ${isWatched(ep.video) ? 'block' : 'none'};"><span class="mx-1">✓</span> </div>
             </div>
             
             <div class="episode-details">
@@ -1102,19 +1104,7 @@ function openVideoPlayer(url) {
 
     // Inicializar Player Interativo
     if (typeof VideoInterativoUniversal !== 'undefined') {
-        const videoOptions = {
-            containerId: 'interactiveVideoContainer',
-            videoUrl: finalUrl,
-            videoId: currentEpisode ? currentEpisode.id : url,
-            autoplay: true,
-            interacoes: interacoes
-        };
-
-        // Se o episódio tem um YTID real, usar o link do YouTube para habilitar a API
-        if (currentEpisode && currentEpisode.ytid) {
-            videoOptions.videoUrl = `https://www.youtube.com/watch?v=${currentEpisode.ytid}`;
-        }
-
+        const videoOptions = getInteractivePlayerOptions(url, currentEpisode, finalUrl);
         window.interactivePlayerInstance = new VideoInterativoUniversal(videoOptions);
     } else {
         console.warn('Classe VideoInterativoUniversal não encontrada.');
@@ -1155,7 +1145,7 @@ function syncModalContent(url) {
             epDiv.innerHTML = `
                 <div class="playlist-episode-thumb">
                    
-                    <div class="watched-check" style="display: ${isWatched(ep.video) ? 'block' : 'none'};">✓</div>
+                    <div class="watched-check-episodio" style="display: ${isWatched(ep.video) ? 'block' : 'none'};"><span class="mx-1">✓</span></div>
                 </div>
                 <div class="playlist-episode-info">
                     <div class="playlist-episode-title">${ep.num}. ${ep.title}</div>
@@ -1230,19 +1220,10 @@ function changeVideo(url) {
         }
     }
 
-    // Rastrear URL
-    window.currentVideoUrl = url;
-    saveProgress(url);
-
-    // Inicializar Player Interativo
+    // Gerar opções e reinicializar
     if (typeof VideoInterativoUniversal !== 'undefined') {
-        window.interactivePlayerInstance = new VideoInterativoUniversal({
-            containerId: 'interactiveVideoContainer',
-            videoUrl: finalUrl,
-            videoId: currentEpisode ? currentEpisode.id : url,
-            autoplay: true,
-            interacoes: interacoes
-        });
+        const videoOptions = getInteractivePlayerOptions(url, currentEpisode, finalUrl);
+        window.interactivePlayerInstance = new VideoInterativoUniversal(videoOptions);
     }
 
     // Marcar como assistido
@@ -1252,6 +1233,29 @@ function changeVideo(url) {
 
     // Sincronizar UI do modal
     syncModalContent(url);
+}
+
+/**
+ * Auxiliar para gerar as opções do Player Interativo Universal
+ * Centraliza a lógica de mapeamento de YTID para garantir consistência
+ */
+function getInteractivePlayerOptions(url, currentEpisode, resolvedUrl) {
+    const interacoes = currentEpisode ? (currentEpisode.interacoes || []) : [];
+    
+    const options = {
+        containerId: 'interactiveVideoContainer',
+        videoUrl: resolvedUrl || url,
+        videoId: currentEpisode ? currentEpisode.id : url,
+        autoplay: true,
+        interacoes: interacoes
+    };
+
+    // Prioridade total ao YTID para garantir controles (API YouTube)
+    if (currentEpisode && currentEpisode.ytid) {
+        options.videoUrl = `https://www.youtube.com/watch?v=${currentEpisode.ytid}`;
+    }
+
+    return options;
 }
 
 function playNextEpisode() {

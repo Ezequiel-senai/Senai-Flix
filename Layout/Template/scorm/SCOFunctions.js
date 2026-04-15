@@ -452,8 +452,12 @@ const FOOTER_HEIGHT_SIZE = 160;
 
 const infosToCompleteScorm = {
   firstPageHTML: "index.html",
-  lastPageHTML: window.menuData.lastPageForCompletion || window.menuData.menu[window.menuData.menu.length - 1].page,
-  lastSectionId: "finished" // Mantido para compatibilidade, mas não usado
+  lastPageHTML: (window.menuData && window.menuData.lastPageForCompletion) 
+                ? window.menuData.lastPageForCompletion 
+                : (window.menuData && window.menuData.menu) 
+                  ? window.menuData.menu[window.menuData.menu.length - 1].page 
+                  : "index.html",
+  lastSectionId: "finished"
 };
 
 const sections = document.querySelectorAll("section[id], article[id]");
@@ -544,4 +548,4 @@ window.addEventListener("scroll", debounce(() => {
   } catch (error) {
     console.error("Erro ao salvar dados de progresso:", error);
   }
-}, 50))};
+}, 50));
