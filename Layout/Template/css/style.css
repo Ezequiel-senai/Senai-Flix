@@ -4074,6 +4074,7 @@ body.theme-1 #icon-sun {
   align-items: center;
   gap: 5px;
   transition: all 0.2s;
+  margin-left:10px
 }
 
 .chapter-pill:hover {

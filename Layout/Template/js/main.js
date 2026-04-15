@@ -1136,7 +1136,12 @@ function syncModalContent(url) {
     if (!currentEpisode) return;
 
     // Título e Sinopse
-    document.getElementById('currentEpisodeSynopsis').innerHTML = `<strong>${currentEpisode.title}</strong><br><br>${currentEpisode.sinopse}<hr>${currentEpisode.bookText}`;
+    document.getElementById('currentEpisodeSynopsis').innerHTML = `<h1>${currentEpisode.title}</h1>${currentEpisode.sinopse}<hr>${currentEpisode.bookText}`;
+
+    // Renderizar Fórmulas (MathJax)
+    if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+        window.MathJax.typesetPromise();
+    }
 
     // Playlist de Episódios
     const seasonEpisodes = episodesData.filter(ep => ep.sa === currentEpisode.sa).sort((a, b) => a.num - b.num);
@@ -1310,10 +1315,14 @@ function playFirstEpisode() {
     if (lastPlayed) {
         openVideoPlayer(lastPlayed);
     } else {
-        const season = document.getElementById('seasonSelector').value;
-        const firstEp = episodesData.find(ep => ep.sa === season && !ep.special);
-        if (firstEp) {
-            openVideoPlayer(firstEp.video);
+        const seasonValue = document.getElementById('seasonSelector').value;
+        try {
+            const firstEp = episodesData.find(ep => ep.sa === seasonValue);
+            if (firstEp) {
+                openVideoPlayer(firstEp.video, { silent: true });
+            }
+        } catch (e) {
+            console.error("Erro ao carregar o vídeo inicial da temporada:", e);
         }
     }
 }
@@ -1385,6 +1394,11 @@ function openConcept(id) {
         const modal = document.getElementById('conceptModal');
         modal.style.display = 'flex';
         setTimeout(() => modal.style.opacity = '1', 10);
+
+        // Forçar renderização do MathJax após injetar conteúdo dinâmico
+        if (window.MathJax) {
+            MathJax.typesetPromise();
+        }
     }
 }
 

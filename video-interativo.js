@@ -277,10 +277,18 @@ class VideoInterativoUniversal {
     }
 
     onYouTubeStateChange(event) {
+        const btnPlay = document.getElementById('btnPlayPause');
+        const bigIcon = document.getElementById('bigPlayIcon');
+
         if (event.data === window.YT.PlayerState.PLAYING) {
             this.wrapper.classList.remove('paused');
+            if (btnPlay) btnPlay.innerHTML = '<span class="material-icons">pause</span>';
+            if (bigIcon) bigIcon.innerText = 'pause_circle_filled';
         } else if (event.data === window.YT.PlayerState.PAUSED) {
             this.wrapper.classList.add('paused');
+            if (btnPlay) btnPlay.innerHTML = '<span class="material-icons">play_arrow</span>';
+            if (bigIcon) bigIcon.innerText = 'play_circle_filled';
+            
             // Força salvar progresso ao pausar
             if (this.youtubePlayer && typeof this.youtubePlayer.getCurrentTime === 'function') {
                  this.saveProgress(this.youtubePlayer.getCurrentTime());
@@ -982,6 +990,11 @@ class VideoInterativoUniversal {
         `;
 
         interactiveOverlay.style.display = 'flex';
+
+        // Renderizar Fórmulas (MathJax)
+        if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+            window.MathJax.typesetPromise();
+        }
 
         // Elementos interativos
         const btnContinue = interactiveOverlay.querySelector('#btnContinueVideo');
