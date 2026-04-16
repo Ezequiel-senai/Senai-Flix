@@ -46,9 +46,10 @@
     <script src="./video-interativo.js"></script>
     <!-- MathJax Configuration -->
     <script>
-        window.videos = {}; // Define objeto vazio para evitar erros de referência
+        window.videos = {};
         window.currentVideoUrl = "";
         window.MathJax = {
+            loader: { load: ['output/svg'] }, // Força o carregamento do módulo SVG
             tex: {
                 inlineMath: [['\\(', '\\)']],
                 displayMath: [['\\[', '\\]']],
@@ -56,49 +57,52 @@
             },
             options: {
                 skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            output: {
+                fontCache: 'global' // Melhora a performance no modo SVG
             }
         };
     </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
+    <script id="MathJax-script" async src="Layout/Template/bibliotecas/mathjax/mathjax.js"></script>
 
 </head>
 
 <body class="font">
     <header>
-<div vw="" class="enabled">
-    <div vw-access-button="" class="active"></div>
-    <div vw-plugin-wrapper="">
-      <div class="vw-plugin-top-wrapper"></div>
-    </div>
-  </div>
-  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-  <script>
-    new window.VLibras.Widget('https://vlibras.gov.br/app');
+        <div vw="" class="enabled">
+            <div vw-access-button="" class="active"></div>
+            <div vw-plugin-wrapper="">
+                <div class="vw-plugin-top-wrapper"></div>
+            </div>
+        </div>
+        <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+        <script>
+            new window.VLibras.Widget('https://vlibras.gov.br/app');
 
-    // Sincroniza Season Selector com SCORM
-    const selector = document.getElementById('seasonSelector');
-    if (selector) {
-        // Restaurar temporada
-        const lastSeason = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastSeason') : localStorage.getItem('lastSeason');
-        if (lastSeason) selector.value = lastSeason;
+            // Sincroniza Season Selector com SCORM
+            const selector = document.getElementById('seasonSelector');
+            if (selector) {
+                // Restaurar temporada
+                const lastSeason = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastSeason') : localStorage.getItem('lastSeason');
+                if (lastSeason) selector.value = lastSeason;
 
-        selector.addEventListener('change', () => {
-             if (typeof setSuspendDataValue === 'function') {
-                 setSuspendDataValue('lastSeason', selector.value);
-             } else {
-                 localStorage.setItem('lastSeason', selector.value);
-             }
-             changeSeason();
-        });
-    }
-  </script>
+                selector.addEventListener('change', () => {
+                    if (typeof setSuspendDataValue === 'function') {
+                        setSuspendDataValue('lastSeason', selector.value);
+                    } else {
+                        localStorage.setItem('lastSeason', selector.value);
+                    }
+                    changeSeason();
+                });
+            }
+        </script>
         <!-- Menu -->
         <!-- Navegação Flutuante Lateral Glass (Animada) -->
         <nav class="glass-nav-left" id="animatedNav">
             <!-- 1. Gatilho: Botão Configurações (Engrenagem) -->
             <button class="glass-btn btn-reset toggle-trigger" type="button"
-                onclick="document.getElementById('animatedNav').classList.toggle('active')" title="Configurações e Acessibilidade">
+                onclick="document.getElementById('animatedNav').classList.toggle('active')"
+                title="Configurações e Acessibilidade">
                 <i class="bx bx-cog bx-spin-hover"></i>
             </button>
 
@@ -113,22 +117,26 @@
                 </button>
 
                 <!-- 3. Botão VLibras -->
-                <button class="glass-btn btn-reset" type="button" title="Tradutor VLibras" onclick="toggleVLibrasAndVideos()">
+                <button class="glass-btn btn-reset" type="button" title="Tradutor VLibras"
+                    onclick="toggleVLibrasAndVideos()">
                     <i class="bx bx-universal-access bx-flashing-hover"></i>
                 </button>
 
                 <!-- 4. Dropdown de Opções Extras -->
                 <div class="dropright">
-                    <button class="glass-btn btn-reset" type="button" id="configDropdown" data-bs-toggle="dropdown" aria-expanded="false"
-                        title="Mais Opções">
+                    <button class="glass-btn btn-reset" type="button" id="configDropdown" data-bs-toggle="dropdown"
+                        aria-expanded="false" title="Mais Opções">
                         <i class="bx bx-plus"></i>
                     </button>
                     <ul class="dropdown-menu border-0 shadow-lg p-3" aria-labelledby="configDropdown"
                         style=" backdrop-filter: blur(10px); min-width: 250px; margin-left: 15px;">
-                        <li><h6 class="dropdown-header text-uppercase opacity-50">Acessibilidade</h6></li>
+                        <li>
+                            <h6 class="dropdown-header text-uppercase opacity-50">Acessibilidade</h6>
+                        </li>
                         <li>
                             <div class="dropdown-item rounded d-flex justify-content-between align-items-center">
-                                <label class="form-check-label small cursor-pointer" for="graySwitcher">Monocromático</label>
+                                <label class="form-check-label small cursor-pointer"
+                                    for="graySwitcher">Monocromático</label>
                                 <div class="form-check form-switch m-0">
                                     <input class="form-check-input" type="checkbox" name="themeBtns" id="graySwitcher">
                                 </div>
@@ -136,9 +144,11 @@
                         </li>
                         <li>
                             <div class="dropdown-item rounded d-flex justify-content-between align-items-center mt-2">
-                                <label class="form-check-label small cursor-pointer" for="daltonicSwitcher">Daltônico</label>
+                                <label class="form-check-label small cursor-pointer"
+                                    for="daltonicSwitcher">Daltônico</label>
                                 <div class="form-check form-switch m-0">
-                                    <input class="form-check-input" type="checkbox" name="themeBtns" id="daltonicSwitcher">
+                                    <input class="form-check-input" type="checkbox" name="themeBtns"
+                                        id="daltonicSwitcher">
                                 </div>
                             </div>
                         </li>
@@ -148,13 +158,13 @@
         </nav>
     </header>
 
-   <main class="pb-1" data-bs-spy="scroll" data-bs-offset="0">
+    <main class="pb-1" data-bs-spy="scroll" data-bs-offset="0">
 
         <div id="senai-player-wrapper" class="position-relative ">
 
             <!-- Header Hero Section -->
             <div class="hero-section">
-               
+
 
                 <div class="hero-video-container" id="heroVideoContainer">
                     <video id="heroVideo" autoplay="" muted="" loop="" playsinline=""></video>
@@ -165,12 +175,13 @@
                 <div class="hero-gradient" id="heroGradient"></div>
 
                 <div class="hero-content" id="heroContent">
-                    <img class="py-5" id="heroLogo" src="./Layout//Template/img/logo_senai.svg" alt="Logo SENAI">
+                    <img class="py-5" id="heroLogo" src="Layout/Template/img/logo_senai.svg" alt="Logo SENAI">
                     <h1 class="text-white">
                         FUNDAMENTOS DA<br>ELETROELETRÔNICA
                     </h1>
                     <div class="hero-meta">
-                        <span class="badge text-bg-danger text-white" style="color: white !important;">3 Situações de Aprendizagem</span>
+                        <span class="badge text-bg-danger text-white" style="color: white !important;">3 Situações de
+                            Aprendizagem</span>
                     </div>
                     <p class="text-white">
                         A base de tudo. Domine tensão, corrente e resistência para diagnosticar falhas reais. Onde a
@@ -179,13 +190,14 @@
 
                     <div class="hero-buttons">
                         <button id="heroPlayBtn" onclick="playFirstEpisode()">
-                            <span class="text-black"> <i class="bx bx-play text-black" title="play"></i></span> <span class="text-black"
-                                id="heroPlayBtnText">Começar</span>
+                            <span class="text-black"> <i class="bx bx-play text-black" title="play"></i></span> <span
+                                class="text-black" id="heroPlayBtnText">Começar</span>
                         </button>
                     </div>
                     <!-- Botão Fullscreen Relocado -->
                     <div class="mt-4">
-                        <button class="btn btn-outline border rounded d-flex align-items-center gap-2" onclick="toggleFullscreen()">
+                        <button class="btn btn-outline border rounded d-flex align-items-center gap-2"
+                            onclick="toggleFullscreen()">
                             <i class="bx bx-fullscreen fs-4 text-white"></i>
                             <span class="small text-white">Clique aqui para habilitar a visualização em
                                 fullscreen.</span>
@@ -206,42 +218,53 @@
                     <h1 class="title">Grandezas Elétricas</h1>
                     <span class="duration">12 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1077774422758692dbce9402d0"></a>
-                    <p class="sinopse">Domine a Lei de Ohm! Entenda de vez a relação entre Tensão, Corrente e Resistência e meça cada
+                    <p class="sinopse">Domine a Lei de Ohm! Entenda de vez a relação entre Tensão, Corrente e
+                        Resistência e meça cada
                         grandeza com segurança para proteger você e seu equipamento.</p>
                     <div class="book-text">
-                            <img src="/Layout/Template/img/sa1/1.jpg" alt="" srcset="">
-                            <p class="fw-bold fs-4">Medições Elétricas</p>
-                            
-                            <p><strong>Prefixos Métricos:</strong> No multímetro, \(250mA\) equivalem a \(0,25A\). Divida por 1000 para converter
-                                miliamperes em Amperes.</p>
-                            
-                            <p><strong>Segurança (Resistência):</strong> Para medir \(\Omega\), o circuito deve estar desenergizado (sem
-                                bateria/fonte) para evitar danos ao técnico e ao aparelho.</p>
-                            
-                            <p class="fw-bold mt-3">Topologia de Medição:</p>
-                            <ul class="mx-4">
-                                <li><strong>Tensão <em>(\(V\))</em>:</strong> Conexão em paralelo aos terminais.</li>
-                                <li><strong>Corrente <em>(\(A\))</em>:</strong> Conexão em série, interrompendo o circuito para intercalar o
-                                    multímetro.</li>
+                        <img src="Layout/Template/img/sa1/1.jpg" alt="" srcset="">
+                        <p class="fw-bold fs-4">Medições Elétricas</p>
+
+                        <p><strong>Prefixos Métricos:</strong> No multímetro, \(250mA\) equivalem a \(0,25A\). Divida
+                            por 1000 para converter
+                            miliamperes em Amperes.</p>
+
+                        <p><strong>Segurança (Resistência):</strong> Para medir \(\Omega\), o circuito deve estar
+                            desenergizado (sem
+                            bateria/fonte) para evitar danos ao técnico e ao aparelho.</p>
+
+                        <p class="fw-bold mt-3">Topologia de Medição:</p>
+                        <ul class="mx-4">
+                            <li><strong>Tensão <em>(\(V\))</em>:</strong> Conexão em paralelo aos terminais.</li>
+                            <li><strong>Corrente <em>(\(A\))</em>:</strong> Conexão em série, interrompendo o circuito
+                                para intercalar o
+                                multímetro.</li>
                         </ul>
-                        <p><strong>Lei de Ohm & Diagnóstico:</strong> Se há Tensão <em>(\(V\))</em> mas a Corrente <em>(\(I\))</em> é zero, o
+                        <p><strong>Lei de Ohm & Diagnóstico:</strong> Se há Tensão <em>(\(V\))</em> mas a Corrente
+                            <em>(\(I\))</em> é zero, o
                             circuito está aberto (ex.: fio solto). Sem caminho físico, não há fluxo de elétrons.</p>
-                        
-                        <p class="mt-3">Na imagem, você compreende que a Tensão (\(12V\)) é a pressão que impulsiona o fluxo. A Corrente é esse
-                            movimento, e converter \(600mA\) para \(0,6A\) é vital. Pela Lei de Ohm, se o fio solta, a resistência isola o
+
+                        <p class="mt-3">Na imagem, você compreende que a Tensão (\(12V\)) é a pressão que impulsiona o
+                            fluxo. A Corrente é esse
+                            movimento, e converter \(600mA\) para \(0,6A\) é vital. Pela Lei de Ohm, se o fio solta, a
+                            resistência isola o
                             caminho e o fluxo elétrico cessa.</p>
                     </div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="60" data-titulo="Topologia de Medição" data-tipo="single" data-msg="Correto!">
+                        <div class="interacao" data-tempo="60" data-titulo="Topologia de Medição" data-tipo="single"
+                            data-msg="Correto!">
                             <div class="pergunta">Como devemos conectar o multímetro para medir a Tensão (V)?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="true">Em paralelo aos terminais do componente.</div>
                                 <div class="opcao" data-correta="false">Em série, interrompendo o circuito.</div>
-                                <div class="opcao" data-correta="false">Tanto faz, desde que o circuito esteja ligado.</div>
+                                <div class="opcao" data-correta="false">Tanto faz, desde que o circuito esteja ligado.
+                                </div>
                             </div>
                         </div>
-                        <div class="interacao" data-tempo="240" data-titulo="Conversão de Unidades" data-tipo="single" data-msg="Perfeito!">
-                            <div class="pergunta">Ao ler 250mA no multímetro, qual o valor equivalente em Amperes (A)?</div>
+                        <div class="interacao" data-tempo="240" data-titulo="Conversão de Unidades" data-tipo="single"
+                            data-msg="Perfeito!">
+                            <div class="pergunta">Ao ler 250mA no multímetro, qual o valor equivalente em Amperes (A)?
+                            </div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">2,5A</div>
                                 <div class="opcao" data-correta="true">0,25A</div>
@@ -255,42 +278,55 @@
                     <h1 class="title fw-bold fs-4">Potência elétrica CC</h1>
                     <span class="duration">58 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1076695620967692dbc8250aa5"></a>
-                    <p class="sinopse">Você aprenderá a medir tensão e corrente para calcular a potência elétrica (Watts) em circuitos de
-                        corrente contínua, dominando a fórmula P = V.I para resolver problemas reais do dia a dia técnico.</p>
+                    <p class="sinopse">Você aprenderá a medir tensão e corrente para calcular a potência elétrica
+                        (Watts) em circuitos de
+                        corrente contínua, dominando a fórmula P = V.I para resolver problemas reais do dia a dia
+                        técnico.</p>
                     <div class="book-text">
                         <p class="fw-bold fs-4">Potência e Medição CC</p>
-                        
-                        <p><strong>Lei de Ohm:</strong> Use o triângulo para isolar <em>\(V\)</em>, <em>\(I\)</em> ou <em>\(R\)</em>. Entenda
-                            que a resistência do filamento limita a corrente, definindo a potência final <em>(\(P = V \cdot I\))</em>.</p>
-                        
+
+                        <p><strong>Lei de Ohm:</strong> Use o triângulo para isolar <em>\(V\)</em>, <em>\(I\)</em> ou
+                            <em>\(R\)</em>. Entenda
+                            que a resistência do filamento limita a corrente, definindo a potência final <em>(\(P = V
+                                \cdot I\))</em>.</p>
+
                         <p class="fw-bold mt-3">Associação:</p>
                         <ul class="mx-4">
                             <li><strong>Série:</strong> Corrente única; se uma lâmpada falha, o circuito cessa.</li>
-                            <li><strong>Paralelo:</strong> Tensão igual (\(12V\)); cargas independentes, ideal para lanternas.</li>
+                            <li><strong>Paralelo:</strong> Tensão igual (\(12V\)); cargas independentes, ideal para
+                                lanternas.</li>
                         </ul>
                         <p class="fw-bold mt-3">Multímetro:</p>
                         <ul class="mx-4">
                             <li><strong>Voltímetro:</strong> Conecte em paralelo (pontas nos terminais).</li>
-                            <li><strong>Amperímetro:</strong> Conecte em série (interrompa o circuito e insira o medidor).</li>
+                            <li><strong>Amperímetro:</strong> Conecte em série (interrompa o circuito e insira o
+                                medidor).</li>
                         </ul>
-                        <p><strong>DataSheets:</strong> Diferencie Potência Nominal (rótulo, ex.: \(21W\)) de Potência Real (calculada via
+                        <p><strong>DataSheets:</strong> Diferencie Potência Nominal (rótulo, ex.: \(21W\)) de Potência
+                            Real (calculada via
                             medição) para diagnosticar brilho insuficiente.</p>
                     </div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="90" data-titulo="Cálculo de Potência" data-tipo="single" data-msg="Isso mesmo!">
-                            <div class="pergunta">Qual a fórmula fundamental para calcular a potência elétrica em corrente contínua?</div>
+                        <div class="interacao" data-tempo="90" data-titulo="Cálculo de Potência" data-tipo="single"
+                            data-msg="Isso mesmo!">
+                            <div class="pergunta">Qual a fórmula fundamental para calcular a potência elétrica em
+                                corrente contínua?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">\(P = V / I\)</div>
                                 <div class="opcao" data-correta="true">\(P = V \cdot I\)</div>
                                 <div class="opcao" data-correta="false">\(P = V + I\)</div>
                             </div>
                         </div>
-                        <div class="interacao" data-tempo="300" data-titulo="Potência Real x Nominal" data-tipo="single" data-msg="Excelente!">
-                            <div class="pergunta">O que deve ser feito se a potência calculada é muito menor que a nominal e o componente não funciona?</div>
+                        <div class="interacao" data-tempo="300" data-titulo="Potência Real x Nominal" data-tipo="single"
+                            data-msg="Excelente!">
+                            <div class="pergunta">O que deve ser feito se a potência calculada é muito menor que a
+                                nominal e o componente não funciona?</div>
                             <div class="opcoes">
-                                <div class="opcao" data-correta="true">Verificar falhas na alimentação ou resistências parasitas.</div>
+                                <div class="opcao" data-correta="true">Verificar falhas na alimentação ou resistências
+                                    parasitas.</div>
                                 <div class="opcao" data-correta="false">Trocar por um fusível maior.</div>
-                                <div class="opcao" data-correta="false">Ignorar, já que a etiqueta garante o funcionamento.</div>
+                                <div class="opcao" data-correta="false">Ignorar, já que a etiqueta garante o
+                                    funcionamento.</div>
                             </div>
                         </div>
                     </div>
@@ -303,53 +339,68 @@
                     <p class="sinopse">Aprenda a diferenciar sinais analógicos e digitais na prática!</p>
                     <div class="book-text">
                         <p class="fw-bold fs-4">Ondas e Osciloscópio</p>
-                        <p>A <strong>Amplitude</strong> é a altura da onda (tensão), e a <strong>Frequência</strong> é a rapidez dos ciclos. No
-                            osciloscópio, use <strong>Volts/Div</strong> para ajustar a altura e <strong>Time/Div</strong> para esticar ou
-                            comprimir o tempo, permitindo ver a transição da senoidal fluida para a quadrada digital.</p>
-                        
+                        <p>A <strong>Amplitude</strong> é a altura da onda (tensão), e a <strong>Frequência</strong> é a
+                            rapidez dos ciclos. No
+                            osciloscópio, use <strong>Volts/Div</strong> para ajustar a altura e
+                            <strong>Time/Div</strong> para esticar ou
+                            comprimir o tempo, permitindo ver a transição da senoidal fluida para a quadrada digital.
+                        </p>
+
                         <p class="fw-bold mt-3">Sistema Binário</p>
-                        <p>O sinal digital é "discreto" porque assume apenas dois estados: \(0\) (nível baixo) ou \(1\) (nível alto). Diferente
+                        <p>O sinal digital é "discreto" porque assume apenas dois estados: \(0\) (nível baixo) ou \(1\)
+                            (nível alto). Diferente
                             do analógico infinito, ele pula entre esses bits definidos.</p>
-                        
+
                         <p class="fw-bold mt-3">Ruído e Precisão</p>
-                        <p>Sinais digitais são mais resistentes a interferências. Enquanto o ruído deforma a onda analógica, o sistema digital
+                        <p>Sinais digitais são mais resistentes a interferências. Enquanto o ruído deforma a onda
+                            analógica, o sistema digital
                             ignora pequenas "sujeiras" elétricas, mantendo a precisão dos dados.</p>
-                        
-                        <p class="mt-3">A imagem ilustra o contraste entre o sinal analógico (contínuo/sensível a ruídos) e o digital (discreto
-                            em bits \(0\) e \(1\)). O gráfico demonstra a transição da onda senoidal para a quadrada, conhecimento essencial
-                            para operar o osciloscópio e compreender a precisão e a resistência a ruídos da tecnologia atual.</p>
+
+                        <p class="mt-3">A imagem ilustra o contraste entre o sinal analógico (contínuo/sensível a
+                            ruídos) e o digital (discreto
+                            em bits \(0\) e \(1\)). O gráfico demonstra a transição da onda senoidal para a quadrada,
+                            conhecimento essencial
+                            para operar o osciloscópio e compreender a precisão e a resistência a ruídos da tecnologia
+                            atual.</p>
                     </div>
                     <div class="formula">\( f = \frac{1}{T} \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="150" data-titulo="Sinais Digitais" data-tipo="single" data-msg="Muito bem!">
-                            <div class="pergunta">Qual a principal vantagem do sinal digital em relação ao analógico em termos de interferência?</div>
+                        <div class="interacao" data-tempo="150" data-titulo="Sinais Digitais" data-tipo="single"
+                            data-msg="Muito bem!">
+                            <div class="pergunta">Qual a principal vantagem do sinal digital em relação ao analógico em
+                                termos de interferência?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">É mais bonito no osciloscópio.</div>
-                                <div class="opcao" data-correta="true">É mais resistente a ruídos e mantém a precisão dos dados.</div>
+                                <div class="opcao" data-correta="true">É mais resistente a ruídos e mantém a precisão
+                                    dos dados.</div>
                                 <div class="opcao" data-correta="false">Possui infinitos níveis de tensão.</div>
                             </div>
                         </div>
                     </div>
                 </div>
-<div id="s1e4" data-sa="s1" data-num="4" data-type="video" data-ytid="KgJla5Z0FDM">
-    <h1 class="title">Cálculo - 1ª Lei de Ohm</h1>
+                <div id="s1e4" data-sa="s1" data-num="4" data-type="video" data-ytid="KgJla5Z0FDM">
+                    <h1 class="title">Cálculo - 1ª Lei de Ohm</h1>
                     <span class="duration">52 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1079757631913692dbd92d407a"></a>
-                    <p class="sinopse">Aprenda a aplicar a 1ª Lei de Ohm para calcular Tensão, Corrente e Resistência. Usando o exemplo de
+                    <p class="sinopse">Aprenda a aplicar a 1ª Lei de Ohm para calcular Tensão, Corrente e Resistência.
+                        Usando o exemplo de
                         um secador, você verá como dimensionar componentes com segurança e precisão técnica</p>
                     <div class="book-text">
                         <p class="fw-bold fs-4">Grandezas e Matemática</p>
-                        <p>As três grandezas fundamentais são: <strong>Tensão (\(V\))</strong>, <strong>Corrente (\(I\))</strong> e <strong>Resistência (\(R\))</strong>.</p>
+                        <p>As três grandezas fundamentais são: <strong>Tensão (\(V\))</strong>, <strong>Corrente
+                                (\(I\))</strong> e <strong>Resistência (\(R\))</strong>.</p>
                         <ul class="mx-4">
                             <li><strong>\(V = R \cdot I\):</strong> Use multiplicação para achar a Tensão.</li>
-                            <li><strong>\(I = V / R\) ou \(R = V / I\):</strong> Use divisão para Corrente ou Resistência.</li>
+                            <li><strong>\(I = V / R\) ou \(R = V / I\):</strong> Use divisão para Corrente ou
+                                Resistência.</li>
                         </ul>
                         <p><strong>Prefixos:</strong> Lembre-se que \(1.000mA = 1A\).</p>
-                        
+
                         <p class="fw-bold fs-4 mt-3">Prática e Proteção</p>
                         <p>No exemplo do secador (\(220V / 700W\)), a corrente calculada é de \(3,14A\).</p>
-                        <p><strong>Fusíveis:</strong> Devem ter capacidade superior ao valor calculado (ex.: \(4A\)) para evitar queimas por picos irrelevantes, mas garantir a segurança.</p>
-                        
+                        <p><strong>Fusíveis:</strong> Devem ter capacidade superior ao valor calculado (ex.: \(4A\))
+                            para evitar queimas por picos irrelevantes, mas garantir a segurança.</p>
+
                         <p class="fw-bold fs-4 mt-3">Circuitos Complexos</p>
                         <p>A Lei de Ohm se expande para:</p>
                         <ul class="mx-4">
@@ -357,59 +408,74 @@
                             <li><strong>Paralelo:</strong> Tensão igual, correntes divididas.</li>
                             <li><strong>Misto:</strong> Combinação de ambos.</li>
                         </ul>
-                        
-                        <p class="mt-3">Esta imagem oferece uma visão abrangente e comparativa dos fundamentos apresentados na videoaula, conectando os conceitos teóricos da 1ª Lei de Ohm com aplicações e analogias intuitivas.</p>
+
+                        <p class="mt-3">Esta imagem oferece uma visão abrangente e comparativa dos fundamentos
+                            apresentados na videoaula, conectando os conceitos teóricos da 1ª Lei de Ohm com aplicações
+                            e analogias intuitivas.</p>
                     </div>
                     <div class="formula">\( V = R \cdot I \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="180" data-titulo="Dimensionamento" data-tipo="single" data-msg="Isso mesmo!">
-                            <div class="pergunta">Como deve ser escolhido o valor de um fusível de proteção após o cálculo da corrente do circuito?</div>
+                        <div class="interacao" data-tempo="180" data-titulo="Dimensionamento" data-tipo="single"
+                            data-msg="Isso mesmo!">
+                            <div class="pergunta">Como deve ser escolhido o valor de um fusível de proteção após o
+                                cálculo da corrente do circuito?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">O mesmo valor da corrente calculada.</div>
-                                <div class="opcao" data-correta="true">Um valor ligeiramente superior para suportar picos, garantindo a proteção.</div>
-                                <div class="opcao" data-correta="false">O dobro do valor calculado por segurança extra.</div>
+                                <div class="opcao" data-correta="true">Um valor ligeiramente superior para suportar
+                                    picos, garantindo a proteção.</div>
+                                <div class="opcao" data-correta="false">O dobro do valor calculado por segurança extra.
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-<div id="s1e5" data-sa="s1" data-num="5" data-type="video" data-ytid="E738SS5QwhU">
+                <div id="s1e5" data-sa="s1" data-num="5" data-type="video" data-ytid="E738SS5QwhU">
                     <h1 class="title">Simulação e Cálculos: OHM</h1>
                     <span class="duration">45 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=10802032402770692dbe144bcef"></a>
-                    <p class="sinopse">Dominar a 1ª Lei de Ohm por meio de cálculos e simulações práticas para analisar circuitos reais com precisão e confiança.</p>
+                    <p class="sinopse">Dominar a 1ª Lei de Ohm por meio de cálculos e simulações práticas para analisar
+                        circuitos reais com precisão e confiança.</p>
                     <div class="book-text">
                         <p>Este material sintetiza os pontos-chave para apoiar sua prática com a 1ª Lei de Ohm.</p>
-                        
+
                         <p class="fw-bold fs-5 mt-3">Esquemas e Simulação</p>
                         <p>Antes de calcular, identifique os símbolos:</p>
                         <ul class="mx-4">
                             <li><strong>V (Fonte):</strong> Linhas paralelas (traço longo é o polo +).</li>
                             <li><strong>R (Resistor):</strong> Retângulo ou linha em zigue-zague.</li>
                         </ul>
-                        <p>No simulador, clique nos componentes para ajustar a tensão \((V)\) e observar a corrente \((I)\).</p>
+                        <p>No simulador, clique nos componentes para ajustar a tensão \((V)\) e observar a corrente
+                            \((I)\).</p>
 
                         <p class="fw-bold fs-5 mt-3">Unidades e Medidas</p>
                         <p>Atenção às conversões para preencher as tabelas corretamente:</p>
                         <ul class="mx-4">
-                            <li><strong>Miliampere (mA):</strong> Divida por 1.000 para obter Ampere \((A)\). Ex.: \(220mA = 0,22A\).</li>
+                            <li><strong>Miliampere (mA):</strong> Divida por 1.000 para obter Ampere \((A)\). Ex.:
+                                \(220mA = 0,22A\).</li>
                             <li><strong>Quilo-ohm (kΩ):</strong> Multiplique por 1.000 para obter Ohm \((\Omega)\).</li>
                         </ul>
 
                         <p class="fw-bold fs-5 mt-3">Teoria x Prática</p>
-                        <p><strong>Cálculo:</strong> \(V = R \cdot I\). Se houver pequena diferença entre o cálculo e o simulador, verifique a resistência interna ou arredondamentos. Use a simulação para validar sua análise em qualquer sistema elétrico.</p>
-                        <p>Use o triângulo para calcular grandezas: \(I = V / R\). Na tabela, compare o cálculo teórico com a prática do simulador (\(220 \Omega\)). Atenção às conversões de \(mA\) para \(A\)!</p>
+                        <p><strong>Cálculo:</strong> \(V = R \cdot I\). Se houver pequena diferença entre o cálculo e o
+                            simulador, verifique a resistência interna ou arredondamentos. Use a simulação para validar
+                            sua análise em qualquer sistema elétrico.</p>
+                        <p>Use o triângulo para calcular grandezas: \(I = V / R\). Na tabela, compare o cálculo teórico
+                            com a prática do simulador (\(220 \Omega\)). Atenção às conversões de \(mA\) para \(A\)!</p>
                     </div>
                     <div class="formula">\( I = \frac{V}{R} \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="120" data-titulo="Simbologia" data-tipo="single" data-msg="Excelente!">
+                        <div class="interacao" data-tempo="120" data-titulo="Simbologia" data-tipo="single"
+                            data-msg="Excelente!">
                             <div class="pergunta">Quais são os símbolos universais para Tensão (V) e Resistor (R)?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">V: Círculo; R: Linha reta.</div>
-                                <div class="opcao" data-correta="true">V: Linhas paralelas (traço longo é +); R: Retângulo ou zigue-zague.</div>
+                                <div class="opcao" data-correta="true">V: Linhas paralelas (traço longo é +); R:
+                                    Retângulo ou zigue-zague.</div>
                                 <div class="opcao" data-correta="false">V: Quadrado; R: Triângulo.</div>
                             </div>
                         </div>
-                        <div class="interacao" data-tempo="240" data-titulo="Conversão de Unidades" data-tipo="single" data-msg="Isso mesmo!">
+                        <div class="interacao" data-tempo="240" data-titulo="Conversão de Unidades" data-tipo="single"
+                            data-msg="Isso mesmo!">
                             <div class="pergunta">Ao converter 220mA para Ampere (A), qual o valor correto?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">2,2A</div>
@@ -424,27 +490,37 @@
                     <h1 class="title">Simulação e Cálculos: Kirchhoff</h1>
                     <span class="duration">60 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=1081635063246692dc03853f1b"></a>
-                    <p class="sinopse">Demonstrar, por meio de simulações e cálculos, o comportamento da tensão e da corrente em circuitos série e paralelo para comprovar a 1ª e a 2ª Lei de Kirchhoff.</p>
+                    <p class="sinopse">Demonstrar, por meio de simulações e cálculos, o comportamento da tensão e da
+                        corrente em circuitos série e paralelo para comprovar a 1ª e a 2ª Lei de Kirchhoff.</p>
                     <div class="book-text">
-                        <p>Para complementar essa videoaula, que foca na comprovação das Leis de Kirchhoff, utilize este guia rápido para fundamentar sua prática e estudos teóricos.</p>
-                        
+                        <p>Para complementar essa videoaula, que foca na comprovação das Leis de Kirchhoff, utilize este
+                            guia rápido para fundamentar sua prática e estudos teóricos.</p>
+
                         <p class="fw-bold fs-5 mt-3">Fundamentos e Sistema Internacional de Unidades</p>
-                        <p>A base de toda análise é a Lei de Ohm: \(V = R \cdot I\). Domine as unidades: Tensão em Volts \((V)\), Corrente em Amperes \((A)\) e Resistência em Ohms \((\Omega)\).</p>
-                        
+                        <p>A base de toda análise é a Lei de Ohm: \(V = R \cdot I\). Domine as unidades: Tensão em Volts
+                            \((V)\), Corrente em Amperes \((A)\) e Resistência em Ohms \((\Omega)\).</p>
+
                         <p class="fw-bold fs-5 mt-3">Estrutura de Circuitos</p>
                         <ul class="mx-4">
-                            <li><strong>Série:</strong> Resistores em fila. A corrente \((I)\) é igual em todos, mas a tensão \((V)\) se divide.</li>
-                            <li><strong>Paralelo:</strong> Resistores lado a lado. A tensão \((V)\) é a mesma, mas a corrente \((I)\) se divide nos nós.</li>
+                            <li><strong>Série:</strong> Resistores em fila. A corrente \((I)\) é igual em todos, mas a
+                                tensão \((V)\) se divide.</li>
+                            <li><strong>Paralelo:</strong> Resistores lado a lado. A tensão \((V)\) é a mesma, mas a
+                                corrente \((I)\) se divide nos nós.</li>
                         </ul>
-                        
+
                         <p class="fw-bold fs-5 mt-3">Simulação Prática</p>
-                        <p>Antes de simular, calcule a Resistência Equivalente. No software, use o Amperímetro em série para medir correntes e o Voltímetro em paralelo para tensões, comprovando as Leis de Kirchhoff de forma visual.</p>
-                        <p><strong>Dica:</strong> Converta sempre os resultados (ex.: \(0,068A = 68mA\)) para leitura correta no simulador.</p>
-                        <p>Confira o passo a passo matemático para dominar a análise de circuitos paralelos. Aprenda a calcular correntes e resistências, validando a 1ª Lei de Kirchhoff antes da simulação.</p>
+                        <p>Antes de simular, calcule a Resistência Equivalente. No software, use o Amperímetro em série
+                            para medir correntes e o Voltímetro em paralelo para tensões, comprovando as Leis de
+                            Kirchhoff de forma visual.</p>
+                        <p><strong>Dica:</strong> Converta sempre os resultados (ex.: \(0,068A = 68mA\)) para leitura
+                            correta no simulador.</p>
+                        <p>Confira o passo a passo matemático para dominar a análise de circuitos paralelos. Aprenda a
+                            calcular correntes e resistências, validando a 1ª Lei de Kirchhoff antes da simulação.</p>
                     </div>
                     <div class="formula">\( \sum V = 0 \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="180" data-titulo="Circuito Série" data-tipo="single" data-msg="Correto!">
+                        <div class="interacao" data-tempo="180" data-titulo="Circuito Série" data-tipo="single"
+                            data-msg="Correto!">
                             <div class="pergunta">Em um circuito série, como se comporta a corrente (I)?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">A corrente se divide proporcionalmente.</div>
@@ -459,33 +535,44 @@
                     <h1 class="title">Medições de grandezas elétricas</h1>
                     <span class="duration">49 min</span>
                     <a class="video" href="https://redirect.sp.senai.br/lk.php?link=10821266185906692dc07da0747"></a>
-                    <p class="sinopse">Efetuar medições de grandezas elétricas em circuitos de corrente contínua para diagnosticar falhas com o uso do multímetro em matriz de contatos.</p>
+                    <p class="sinopse">Efetuar medições de grandezas elétricas em circuitos de corrente contínua para
+                        diagnosticar falhas com o uso do multímetro em matriz de contatos.</p>
                     <div class="book-text">
-                        <p>Conecte a teoria à prática de bancada com estas orientações fundamentais para a montagem em matriz de contatos.</p>
-                        
+                        <p>Conecte a teoria à prática de bancada com estas orientações fundamentais para a montagem em
+                            matriz de contatos.</p>
+
                         <p class="fw-bold fs-5 mt-3">Diagramas e Simbologia</p>
-                        <p>Antes de montar, identifique os símbolos de resistores e fontes. Transponha o esquema do papel para a matriz de contatos, respeitando as trilhas de continuidade interna (nós).</p>
-                        
+                        <p>Antes de montar, identifique os símbolos de resistores e fontes. Transponha o esquema do
+                            papel para a matriz de contatos, respeitando as trilhas de continuidade interna (nós).</p>
+
                         <p class="fw-bold fs-5 mt-3">Cálculo Prévio (Lei de Ohm)</p>
-                        <p>Utilize \(V = R \cdot I\) para prever os valores de tensão e corrente. No circuito misto, use a fórmula do divisor de tensão para validar o que o multímetro exibirá na tela.</p>
-                        
+                        <p>Utilize \(V = R \cdot I\) para prever os valores de tensão e corrente. No circuito misto, use
+                            a fórmula do divisor de tensão para validar o que o multímetro exibirá na tela.</p>
+
                         <p class="fw-bold fs-5 mt-3">Segurança e Medição</p>
                         <ul class="mx-4">
                             <li>Configure a escala correta no multímetro antes de tocar o circuito.</li>
                             <li>Meça resistência com o circuito desenergizado.</li>
                             <li>Confira a polaridade das pontas de prova ao medir tensão e corrente.</li>
                         </ul>
-                        <p><strong>Dica:</strong> A estimativa teórica evita danos ao multímetro e erros de interpretação.</p>
-                        <p>A imagem apresenta diagramas e analogias hidráulicas que ilustram como a tensão e a corrente fluem nos circuitos série, paralelo e misto. Utilize este recurso para compreender a relação entre as grandezas e prever os valores das medições no multímetro.</p>
+                        <p><strong>Dica:</strong> A estimativa teórica evita danos ao multímetro e erros de
+                            interpretação.</p>
+                        <p>A imagem apresenta diagramas e analogias hidráulicas que ilustram como a tensão e a corrente
+                            fluem nos circuitos série, paralelo e misto. Utilize este recurso para compreender a relação
+                            entre as grandezas e prever os valores das medições no multímetro.</p>
                     </div>
                     <div class="formula">\( R_{eq} = R_1 + R_2 + ... \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="150" data-titulo="Medição de Resistência" data-tipo="single" data-msg="Muito bem!">
-                            <div class="pergunta">Qual a condição principal para medir a resistência de um componente com segurança?</div>
+                        <div class="interacao" data-tempo="150" data-titulo="Medição de Resistência" data-tipo="single"
+                            data-msg="Muito bem!">
+                            <div class="pergunta">Qual a condição principal para medir a resistência de um componente
+                                com segurança?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="true">O circuito deve estar desenergizado.</div>
-                                <div class="opcao" data-correta="false">O multímetro deve estar em escala de corrente.</div>
-                                <div class="opcao" data-correta="false">O circuito deve estar ligado em corrente máxima.</div>
+                                <div class="opcao" data-correta="false">O multímetro deve estar em escala de corrente.
+                                </div>
+                                <div class="opcao" data-correta="false">O circuito deve estar ligado em corrente máxima.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -496,31 +583,40 @@
                     <h1 class="title">Sinais Alternados</h1>
                     <span class="duration">10 min</span>
                     <a class="video" href="https://example.com/sa2e1"></a>
-                    <p class="sinopse">Compreender as características dos sinais alternados, diferenciando-os dos contínuos e explorando sua aplicação na transmissão de energia e grandezas elétricas.</p>
+                    <p class="sinopse">Compreender as características dos sinais alternados, diferenciando-os dos
+                        contínuos e explorando sua aplicação na transmissão de energia e grandezas elétricas.</p>
                     <div class="book-text">
-                        <p>Conecte a teoria à prática de bancada com estas orientações fundamentais para a interpretação e medição de sinais alternados.</p>
-                        
+                        <p>Conecte a teoria à prática de bancada com estas orientações fundamentais para a interpretação
+                            e medição de sinais alternados.</p>
+
                         <p class="fw-bold fs-5 mt-3">A Senoide e Grandezas</p>
                         <p>Visualize o sinal CA como uma onda que oscila no tempo.</p>
                         <ul class="mx-4">
                             <li><strong>\(V_p\) (Pico):</strong> Valor máximo da onda.</li>
                             <li><strong>Frequência (\(f\)):</strong> Ciclos por segundo (Hz).</li>
                         </ul>
-                        
+
                         <p class="fw-bold fs-5 mt-3">Cálculo Essencial</p>
-                        <p>Para obter o valor eficaz (o que o multímetro mede), use: \(V_{rms} = \frac{V_p}{\sqrt{2}}\)</p>
-                        
+                        <p>Para obter o valor eficaz (o que o multímetro mede), use: \( \displaystyle V_{rms} =
+                            \frac{V_p}{\sqrt{2}} \)</p>
+                            <p>Use a fórmula: \( \displaystyle V_{rms} = \frac{V_p}{\sqrt{2}} \)</p>
+
                         <p class="fw-bold fs-5 mt-3">Indução e Transformadores</p>
-                        <p>A "flexibilização" citada ocorre via indução eletromagnética. Transformadores alteram os níveis de tensão/corrente, permitindo transportar energia a longas distâncias com baixa perda.</p>
-                        
+                        <p>A "flexibilização" citada ocorre via indução eletromagnética. Transformadores alteram os
+                            níveis de tensão/corrente, permitindo transportar energia a longas distâncias com baixa
+                            perda.</p>
+
                         <p class="fw-bold fs-5 mt-3 text-danger">Segurança</p>
-                        <p>Diferente das pilhas (CC estável), a rede CA das tomadas possui alta energia e alternância de ciclo, podendo causar fibrilação cardíaca e danos severos a eletrônicos sensíveis.</p>
+                        <p>Diferente das pilhas (CC estável), a rede CA das tomadas possui alta energia e alternância de
+                            ciclo, podendo causar fibrilação cardíaca e danos severos a eletrônicos sensíveis.</p>
                         <p><strong>Nunca conecte dispositivos CC diretamente na tomada!</strong></p>
-                        <p>Confira na representação visual a seguir como esses conceitos se traduzem em formas de onda, componentes de rede e práticas seguras de medição.</p>
+                        <p>Confira na representação visual a seguir como esses conceitos se traduzem em formas de onda,
+                            componentes de rede e práticas seguras de medição.</p>
                     </div>
                     <div class="formula">\( V_{rms} = \frac{V_p}{\sqrt{2}} \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="120" data-titulo="Valor Eficaz" data-tipo="single" data-msg="Correto!">
+                        <div class="interacao" data-tempo="120" data-titulo="Valor Eficaz" data-tipo="single"
+                            data-msg="Correto!">
                             <div class="pergunta">O que o multímetro exibe ao medir uma tensão alternada?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">O Valor de Pico (Vp).</div>
@@ -535,30 +631,40 @@
                     <h1 class="title">Indutor em Regime CA</h1>
                     <span class="duration">12 min</span>
                     <a class="video" href="https://example.com/sa2e2"></a>
-                    <p class="sinopse">Entenda o comportamento dos indutores em corrente alternada por meio de cálculos e simulações práticas de circuitos RL.</p>
+                    <p class="sinopse">Entenda o comportamento dos indutores em corrente alternada por meio de cálculos
+                        e simulações práticas de circuitos RL.</p>
                     <div class="book-text">
-                        <p>Para complementar seus estudos, utilize este guia rápido como suporte para realizar os cálculos e as medições de circuitos indutivos em corrente alternada.</p>
-                        
+                        <p>Para complementar seus estudos, utilize este guia rápido como suporte para realizar os
+                            cálculos e as medições de circuitos indutivos em corrente alternada.</p>
+
                         <p class="fw-bold fs-5 mt-3">Indutores em CA</p>
-                        <p>Para calcular a oposição do indutor à passagem da corrente, utilize a fórmula da Reatância Indutiva: \(X_L = 2\pi \cdot f \cdot L\)</p>
-                        
+                        <p>Para calcular a oposição do indutor à passagem da corrente, utilize a fórmula da Reatância
+                            Indutiva: \(X_L = 2\pi \cdot f \cdot L\)</p>
+
                         <p class="fw-bold fs-5 mt-3">Análise do Circuito RL</p>
-                        <p>Em circuitos de corrente alternada, a tensão total da fonte \((V)\) deve ser calculada considerando a defasagem entre o resistor e o indutor: \(V = \sqrt{V_R^2 + V_L^2}\)</p>
-                        
+                        <p>Em circuitos de corrente alternada, a tensão total da fonte \((V)\) deve ser calculada
+                            considerando a defasagem entre o resistor e o indutor: \(V = \sqrt{V_R^2 + V_L^2}\)</p>
+
                         <p class="fw-bold fs-5 mt-3">Procedimento de Medição</p>
                         <ul class="mx-4">
                             <li>Ajuste o Gerador de Sinais para a tensão e frequências indicadas no experimento.</li>
-                            <li>Utilize o Multímetro para medir as quedas de tensão e validar a relação entre teoria e prática.</li>
+                            <li>Utilize o Multímetro para medir as quedas de tensão e validar a relação entre teoria e
+                                prática.</li>
                         </ul>
-                        
+
                         <p class="fw-bold fs-5 mt-3">Aplicação Industrial</p>
-                        <p>O entendimento dessas reatâncias é a base para o funcionamento de circuitos PFC (Correção de Fator de Potência), essenciais para a eficiência energética em equipamentos como inversores de frequência e fontes de computadores.</p>
-                        <p>Confira o passo a passo da resolução para calcular a reatância e a impedância do circuito RL analisado.</p>
+                        <p>O entendimento dessas reatâncias é a base para o funcionamento de circuitos PFC (Correção de
+                            Fator de Potência), essenciais para a eficiência energética em equipamentos como inversores
+                            de frequência e fontes de computadores.</p>
+                        <p>Confira o passo a passo da resolução para calcular a reatância e a impedância do circuito RL
+                            analisado.</p>
                     </div>
                     <div class="formula">\( X_L = 2\pi f L \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="180" data-titulo="Reatância Indutiva" data-tipo="single" data-msg="Isso mesmo!">
-                            <div class="pergunta">Qual grandeza física se opõe à passagem da corrente em um indutor em regime CA?</div>
+                        <div class="interacao" data-tempo="180" data-titulo="Reatância Indutiva" data-tipo="single"
+                            data-msg="Isso mesmo!">
+                            <div class="pergunta">Qual grandeza física se opõe à passagem da corrente em um indutor em
+                                regime CA?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">Resistência Ôhmica.</div>
                                 <div class="opcao" data-correta="true">Reatância Indutiva (XL).</div>
@@ -572,29 +678,38 @@
                     <h1 class="title">Transformadores</h1>
                     <span class="duration">15 min</span>
                     <a class="video" href="https://example.com/sa2e3"></a>
-                    <p class="sinopse">Aprenda o funcionamento e as medições de transformadores monofásicos e trifásicos, calculando na prática sua relação de transformação.</p>
+                    <p class="sinopse">Aprenda o funcionamento e as medições de transformadores monofásicos e
+                        trifásicos, calculando na prática sua relação de transformação.</p>
                     <div class="book-text">
-                        <p>Siga este guia prático para aplicar as leis de indução e realizar medições seguras em transformadores monofásicos e trifásicos.</p>
-                        
+                        <p>Siga este guia prático para aplicar as leis de indução e realizar medições seguras em
+                            transformadores monofásicos e trifásicos.</p>
+
                         <p class="fw-bold fs-5 mt-3">Fundamentos e Prática</p>
                         <ul class="mx-4">
-                            <li><strong>Indução (Faraday/Lenz):</strong> O fluxo magnético variável no núcleo gera tensão nos enrolamentos.</li>
-                            <li><strong>Cálculo da Relação (\(\alpha\)):</strong> Use a fórmula \(\alpha = V_p / V_s\) para determinar se o transformador é elevador ou abaishador.</li>
-                            <li><strong>Conexões Trifásicas:</strong> Identifique se as bobinas estão em Estrela (\(\gamma\)) ou Triângulo (\(\Delta\)) antes de medir.</li>
+                            <li><strong>Indução (Faraday/Lenz):</strong> O fluxo magnético variável no núcleo gera
+                                tensão nos enrolamentos.</li>
+                            <li><strong>Cálculo da Relação (\(\alpha\)):</strong> Use a fórmula \(\alpha = V_p / V_s\)
+                                para determinar se o transformador é elevador ou abaishador.</li>
+                            <li><strong>Conexões Trifásicas:</strong> Identifique se as bobinas estão em Estrela
+                                (\(\gamma\)) ou Triângulo (\(\Delta\)) antes de medir.</li>
                         </ul>
-                        
+
                         <p class="fw-bold fs-5 mt-3">Checklist de Segurança e Medição (NR-10)</p>
                         <ul class="mx-4">
                             <li><strong>Proteção:</strong> Use EPIs e verifique se a bancada está aterrada.</li>
                             <li><strong>Multímetro:</strong> Selecione a escala de Tensão Alternada (VAC).</li>
-                            <li><strong>Execução:</strong> Meça o primário (\(V_p\)) e depois o secundário (\(V_s\)) com firmeza nas pontas de prova.</li>
+                            <li><strong>Execução:</strong> Meça o primário (\(V_p\)) e depois o secundário (\(V_s\)) com
+                                firmeza nas pontas de prova.</li>
                         </ul>
-                        <p>Entenda o princípio da indução eletromagnética visualizando como o fluxo magnético percorre o núcleo para transformar tensões e correntes.</p>
+                        <p>Entenda o princípio da indução eletromagnética visualizando como o fluxo magnético percorre o
+                            núcleo para transformar tensões e correntes.</p>
                     </div>
                     <div class="formula">\( \alpha = \frac{V_p}{V_s} \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="210" data-titulo="Relação de Transformação" data-tipo="single" data-msg="Exato!">
-                            <div class="pergunta">Se o primário tem 220V e o secundário 110V, qual a relação de transformação?</div>
+                        <div class="interacao" data-tempo="210" data-titulo="Relação de Transformação"
+                            data-tipo="single" data-msg="Exato!">
+                            <div class="pergunta">Se o primário tem 220V e o secundário 110V, qual a relação de
+                                transformação?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="true">2</div>
                                 <div class="opcao" data-correta="false">0,5</div>
@@ -609,26 +724,35 @@
                     <h1 class="title">Capacitor em Regime CC</h1>
                     <span class="duration">10 min</span>
                     <a class="video" href="https://example.com/sa3e1"></a>
-                    <p class="sinopse">Aprenda a calcular e medir a carga e descarga de capacitores em corrente contínua, compreendendo sua aplicação prática em circuitos temporizadores como minuterias.</p>
+                    <p class="sinopse">Aprenda a calcular e medir a carga e descarga de capacitores em corrente
+                        contínua, compreendendo sua aplicação prática em circuitos temporizadores como minuterias.</p>
                     <div class="book-text">
                         <p class="fw-bold fs-5 mt-3">A Constante de Tempo (\(\tau\))</p>
-                        <p>O tempo de carga/descarga depende de \(R\) e \(C\). A fórmula é \(\tau = R \cdot C\). Um capacitor é considerado carregado após \(5\tau\).</p>
-                        
+                        <p>O tempo de carga/descarga depende de \(R\) e \(C\). A fórmula é \(\tau = R \cdot C\). Um
+                            capacitor é considerado carregado após \(5\tau\).</p>
+
                         <p class="fw-bold fs-5 mt-3">Prática e Segurança</p>
                         <ul class="mx-4">
-                            <li><strong>Multímetro:</strong> Use a escala de Tensão Contínua (VDC) em paralelo ao capacitor.</li>
-                            <li><strong>Cronômetro:</strong> Dispare ao ligar o circuito para validar os ~24s (carga) ou ~16,5s (descarga).</li>
-                            <li><strong>Polaridade:</strong> O capacitor eletrolítico possui lado negativo indicado na carcaça; inverter pode causar danos.</li>
+                            <li><strong>Multímetro:</strong> Use a escala de Tensão Contínua (VDC) em paralelo ao
+                                capacitor.</li>
+                            <li><strong>Cronômetro:</strong> Dispare ao ligar o circuito para validar os ~24s (carga) ou
+                                ~16,5s (descarga).</li>
+                            <li><strong>Polaridade:</strong> O capacitor eletrolítico possui lado negativo indicado na
+                                carcaça; inverter pode causar danos.</li>
                         </ul>
-                        
+
                         <p class="fw-bold fs-5 mt-3">O Circuito de Minuteria</p>
-                        <p>O resistor limita a corrente, controlando a velocidade da carga. Quando a tensão no capacitor atinge o limite, o Relé (interruptor eletromecânico) desarma, desligando a lâmpada.</p>
-                        <p>Para complementar o seu aprendizado, confira o infográfico abaixo que detalha o comportamento do Circuito RC.</p>
+                        <p>O resistor limita a corrente, controlando a velocidade da carga. Quando a tensão no capacitor
+                            atinge o limite, o Relé (interruptor eletromecânico) desarma, desligando a lâmpada.</p>
+                        <p>Para complementar o seu aprendizado, confira o infográfico abaixo que detalha o comportamento
+                            do Circuito RC.</p>
                     </div>
                     <div class="formula">\( \tau = R \cdot C \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="150" data-titulo="Constante de Tempo" data-tipo="single" data-msg="Correto!">
-                            <div class="pergunta">Quanto tempo leva para um capacitor ser considerado totalmente carregado?</div>
+                        <div class="interacao" data-tempo="150" data-titulo="Constante de Tempo" data-tipo="single"
+                            data-msg="Correto!">
+                            <div class="pergunta">Quanto tempo leva para um capacitor ser considerado totalmente
+                                carregado?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">1 constante de tempo (\(\tau\)).</div>
                                 <div class="opcao" data-correta="true">5 constantes de tempo (\(5\tau\)).</div>
@@ -642,34 +766,48 @@
                     <h1 class="title">Diodos Retificadores</h1>
                     <span class="duration">12 min</span>
                     <a class="video" href="https://example.com/sa3e2"></a>
-                    <p class="sinopse">Aprenda a identificar e testar o funcionamento de diodos retificadores, dominando o uso de semicondutores e multímetros em aplicações práticas.</p>
+                    <p class="sinopse">Aprenda a identificar e testar o funcionamento de diodos retificadores, dominando
+                        o uso de semicondutores e multímetros em aplicações práticas.</p>
                     <div class="book-text">
-                        <p>Para complementar a videoaula sobre diodos retificadores, utilize este guia rápido focado na prática profissional:</p>
-                        
+                        <p>Para complementar a videoaula sobre diodos retificadores, utilize este guia rápido focado na
+                            prática profissional:</p>
+
                         <p class="fw-bold fs-5 mt-3">Simbologia e Estrutura</p>
-                        <p>O diodo é um componente ativo formado por material semicondutor. Possui dois terminais: Anodo (A) e Catodo (K). No esquema elétrico, o triângulo indica o sentido da corrente, e o traço representa o Catodo.</p>
-                        
+                        <p>O diodo é um componente ativo formado por material semicondutor. Possui dois terminais: Anodo
+                            (A) e Catodo (K). No esquema elétrico, o triângulo indica o sentido da corrente, e o traço
+                            representa o Catodo.</p>
+
                         <p class="fw-bold fs-5 mt-3">Polarização e Funcionamento</p>
                         <ul class="mx-4">
-                            <li><strong>Direta:</strong> (+) no Anodo e (-) no Catodo; o componente permite a passagem de corrente.</li>
-                            <li><strong>Reversa:</strong> (+) no Catodo e (-) no Anodo; o componente bloqueia o fluxo elétrico.</li>
+                            <li><strong>Direta:</strong> (+) no Anodo e (-) no Catodo; o componente permite a passagem
+                                de corrente.</li>
+                            <li><strong>Reversa:</strong> (+) no Catodo e (-) no Anodo; o componente bloqueia o fluxo
+                                elétrico.</li>
                         </ul>
-                        
+
                         <p class="fw-bold fs-5 mt-3">Teste com Multímetro</p>
-                        <p>Com o instrumento na escala de diodo (símbolo \(\rightarrow|-\)), verifique o estado do componente:</p>
+                        <p>Com o instrumento na escala de diodo (símbolo \(\rightarrow|-\)), verifique o estado do
+                            componente:</p>
                         <ul class="mx-4">
-                            <li><strong>Bom estado:</strong> Exibe valor de condução em um sentido (ex.: ~0,7V) e bloqueio no outro ("OL").</li>
-                            <li><strong>Defeituoso:</strong> Se marcar "000" (curto-circuito) ou "OL" em ambos os sentidos (aberto).</li>
+                            <li><strong>Bom estado:</strong> Exibe valor de condução em um sentido (ex.: ~0,7V) e
+                                bloqueio no outro ("OL").</li>
+                            <li><strong>Defeituoso:</strong> Se marcar "000" (curto-circuito) ou "OL" em ambos os
+                                sentidos (aberto).</li>
                         </ul>
-                        <p><strong>Datasheet:</strong> Consulte sempre o código do fabricante para validar a corrente e tensão máxima suportada antes da instalação.</p>
-                        <p>Confira no infográfico os detalhes físicos do diodo 1N4007 e como sua curva de comportamento define exatamente quando o componente permite ou bloqueia a passagem da corrente elétrica.</p>
+                        <p><strong>Datasheet:</strong> Consulte sempre o código do fabricante para validar a corrente e
+                            tensão máxima suportada antes da instalação.</p>
+                        <p>Confira no infográfico os detalhes físicos do diodo 1N4007 e como sua curva de comportamento
+                            define exatamente quando o componente permite ou bloqueia a passagem da corrente elétrica.
+                        </p>
                     </div>
                     <div class="formula">\( V_d \approx 0,7V \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="200" data-titulo="Polarização Direta" data-tipo="single" data-msg="Muito bem!">
+                        <div class="interacao" data-tempo="200" data-titulo="Polarização Direta" data-tipo="single"
+                            data-msg="Muito bem!">
                             <div class="pergunta">O que acontece na polarização direta do diodo?</div>
                             <div class="opcoes">
-                                <div class="opcao" data-correta="true">O componente permite a passagem da corrente.</div>
+                                <div class="opcao" data-correta="true">O componente permite a passagem da corrente.
+                                </div>
                                 <div class="opcao" data-correta="false">O componente bloqueia totalmente o fluxo.</div>
                                 <div class="opcao" data-correta="false">O componente explode.</div>
                             </div>
@@ -681,31 +819,41 @@
                     <h1 class="title">Reta de carga de um diodo</h1>
                     <span class="duration">15 min</span>
                     <a class="video" href="https://example.com/sa3e3"></a>
-                    <p class="sinopse">Demonstração dos cálculos e da análise gráfica da reta de carga para a correta polarização e operação segura de um diodo retificador.</p>
+                    <p class="sinopse">Demonstração dos cálculos e da análise gráfica da reta de carga para a correta
+                        polarização e operação segura de um diodo retificador.</p>
                     <div class="book-text">
-                        <p>Para complementar a videoaula sobre reta de carga, aqui está um resumo técnico focado nos fundamentos essenciais:</p>
-                        
+                        <p>Para complementar a videoaula sobre reta de carga, aqui está um resumo técnico focado nos
+                            fundamentos essenciais:</p>
+
                         <p class="fw-bold fs-5 mt-3">Base Teórica e Cálculo</p>
-                        <p>A reta de carga surge da Lei de Kirchhoff na malha: \(V_{fonte} = (R \cdot I) + V_{diodo}\)</p>
+                        <p>A reta de carga surge da Lei de Kirchhoff na malha: \(V_{fonte} = (R \cdot I) + V_{diodo}\)
+                        </p>
                         <ul class="mx-4">
                             <li><strong>Eixo I:</strong> Máxima corrente se \(V_{diodo} = 0\) (\(I = V/R\))</li>
                             <li><strong>Eixo V:</strong> Máxima tensão se \(I = 0\) (\(V = V_{fonte}\))</li>
                         </ul>
-                        
+
                         <p class="fw-bold fs-5 mt-3">O Ponto Q (Operação)</p>
-                        <p>É o cruzamento entre essa reta e a Curva Característica do semicondutor. Esse ponto define a tensão e corrente reais de trabalho.</p>
-                        
+                        <p>É o cruzamento entre essa reta e a Curva Característica do semicondutor. Esse ponto define a
+                            tensão e corrente reais de trabalho.</p>
+
                         <p class="fw-bold fs-5 mt-3">Segurança e Dimensionamento</p>
-                        <p>Consulte o Datasheet para garantir que o Ponto Q não exceda a Potência Máxima (\(P = V \cdot I\)) suportada. Operar acima desse limite causa a queima prematura do componente.</p>
-                        <p>Neste diagrama \(I \times V\), a curva exponencial do diodo representa seu comportamento real de condução, enquanto a reta de carga mostra as limitações impostas pela fonte e pelo resistor; o ponto onde ambas se cruzam, chamado Ponto Q, indica a tensão e a corrente reais de operação do diodo no circuito.</p>
+                        <p>Consulte o Datasheet para garantir que o Ponto Q não exceda a Potência Máxima (\(P = V \cdot
+                            I\)) suportada. Operar acima desse limite causa a queima prematura do componente.</p>
+                        <p>Neste diagrama \(I \times V\), a curva exponencial do diodo representa seu comportamento real
+                            de condução, enquanto a reta de carga mostra as limitações impostas pela fonte e pelo
+                            resistor; o ponto onde ambas se cruzam, chamado Ponto Q, indica a tensão e a corrente reais
+                            de operação do diodo no circuito.</p>
                     </div>
                     <div class="formula">\( V_{fonte} = R \cdot I + V_d \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="250" data-titulo="Ponto Quiascente" data-tipo="single" data-msg="Perfeito!">
+                        <div class="interacao" data-tempo="250" data-titulo="Ponto Quiascente" data-tipo="single"
+                            data-msg="Perfeito!">
                             <div class="pergunta">O que define o Ponto Q em um gráfico de reta de carga?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">O valor máximo da resistência.</div>
-                                <div class="opcao" data-correta="true">O cruzamento entre a reta de carga e a curva característica do diodo.</div>
+                                <div class="opcao" data-correta="true">O cruzamento entre a reta de carga e a curva
+                                    característica do diodo.</div>
                                 <div class="opcao" data-correta="false">O ponto onde a tensão é zero.</div>
                             </div>
                         </div>
@@ -716,28 +864,39 @@
                     <h1 class="title">Diodos especiais - LED</h1>
                     <span class="duration">12 min</span>
                     <a class="video" href="https://example.com/sa3e4"></a>
-                    <p class="sinopse">Aprenda a calcular o resistor ideal para LEDs, garantindo a segurança e a durabilidade do seu circuito eletrônico por meio da aplicação prática da Lei de Ohm.</p>
+                    <p class="sinopse">Aprenda a calcular o resistor ideal para LEDs, garantindo a segurança e a
+                        durabilidade do seu circuito eletrônico por meio da aplicação prática da Lei de Ohm.</p>
                     <div class="book-text">
-                        <p>Utilize este guia rápido para entender o dimensionamento de componentes e garantir que seus LEDs funcionem com máxima eficiência e segurança técnica.</p>
-                        <p>Para calcular o resistor (\(R\)), usamos a Lei de Ohm adaptada: \(R = \frac{V_{fonte} - V_{LED}}{I_{LED}}\).</p>
-                        
+                        <p>Utilize este guia rápido para entender o dimensionamento de componentes e garantir que seus
+                            LEDs funcionem com máxima eficiência e segurança técnica.</p>
+                        <p>Para calcular o resistor (\(R\)), usamos a Lei de Ohm adaptada: \(R = \frac{V_{fonte} -
+                            V_{LED}}{I_{LED}}\).</p>
+
                         <p class="fw-bold fs-5 mt-3">Onde buscar dados?</p>
-                        <p>Consulte o Datasheet do componente para achar a tensão direta (\(V_{LED}\)) e a corrente (\(I_{LED}\)). Ex.: LED Vermelho \(\approx 2V / 20mA\).</p>
-                        
+                        <p>Consulte o Datasheet do componente para achar a tensão direta (\(V_{LED}\)) e a corrente
+                            (\(I_{LED}\)). Ex.: LED Vermelho \(\approx 2V / 20mA\).</p>
+
                         <p class="fw-bold fs-5 mt-3">Ponto de Operação</p>
-                        <p>O Ponto Q é onde a curva do LED cruza a linha de carga do circuito, definindo seu funcionamento real.</p>
-                        
+                        <p>O Ponto Q é onde a curva do LED cruza a linha de carga do circuito, definindo seu
+                            funcionamento real.</p>
+
                         <p class="fw-bold fs-5 mt-3">Prática e Ajustes</p>
                         <ul class="mx-4">
-                            <li><strong>Resistores:</strong> Se o valor calculado não for comercial, use a associação de resistores ou o valor superior mais próximo.</li>
-                            <li><strong>Multímetro:</strong> Com o circuito ligado, meça a tensão sobre o LED e a corrente em série para validar os cálculos da aula.</li>
+                            <li><strong>Resistores:</strong> Se o valor calculado não for comercial, use a associação de
+                                resistores ou o valor superior mais próximo.</li>
+                            <li><strong>Multímetro:</strong> Com o circuito ligado, meça a tensão sobre o LED e a
+                                corrente em série para validar os cálculos da aula.</li>
                         </ul>
-                        <p>Observe no gráfico como a Linha de carga encontra a Curva do LED. Esse encontro é o Ponto Q, onde descobrimos a tensão e a corrente exatas que farão seu LED brilhar com segurança e eficiência!</p>
+                        <p>Observe no gráfico como a Linha de carga encontra a Curva do LED. Esse encontro é o Ponto Q,
+                            onde descobrimos a tensão e a corrente exatas que farão seu LED brilhar com segurança e
+                            eficiência!</p>
                     </div>
                     <div class="formula">\( R = \frac{V_f - V_{led}}{I_{led}} \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="200" data-titulo="Cálculo do Resistor" data-tipo="single" data-msg="Excelente!">
-                            <div class="pergunta">Qual fórmula é usada para dimensionar o resistor de proteção de um LED?</div>
+                        <div class="interacao" data-tempo="200" data-titulo="Cálculo do Resistor" data-tipo="single"
+                            data-msg="Excelente!">
+                            <div class="pergunta">Qual fórmula é usada para dimensionar o resistor de proteção de um
+                                LED?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">\(R = V / I\)</div>
                                 <div class="opcao" data-correta="true">\(R = (V_{fonte} - V_{LED}) / I_{LED}\)</div>
@@ -751,13 +910,16 @@
                     <h1 class="title">Diodo Zener - Aplicação</h1>
                     <span class="duration">10 min</span>
                     <a class="video" href="https://example.com/sa3e5"></a>
-                    <p class="sinopse">Aprenda a utilizar o diodo zener como regulador de tensão para estabilizar circuitos, realizando cálculos de dimensionamento e medições práticas com o osciloscópio.</p>
+                    <p class="sinopse">Aprenda a utilizar o diodo zener como regulador de tensão para estabilizar
+                        circuitos, realizando cálculos de dimensionamento e medições práticas com o osciloscópio.</p>
                     <div class="book-text">
-                        <p>Utilize este guia rápido para entender o dimensionamento e a aplicação prática do Diodo Zener, garantindo a estabilização precisa da tensão em seus projetos.</p>
-                        
+                        <p>Utilize este guia rápido para entender o dimensionamento e a aplicação prática do Diodo
+                            Zener, garantindo a estabilização precisa da tensão em seus projetos.</p>
+
                         <p class="fw-bold fs-5 mt-3">Funcionamento e Polarização</p>
-                        <p>O Zener opera na polarização reversa. Diferente do diodo comum, ele conduz corrente ao atingir a \(V_Z\) (tensão Zener) sem se danificar, mantendo a saída constante.</p>
-                        
+                        <p>O Zener opera na polarização reversa. Diferente do diodo comum, ele conduz corrente ao
+                            atingir a \(V_Z\) (tensão Zener) sem se danificar, mantendo a saída constante.</p>
+
                         <p class="fw-bold fs-5 mt-3">Dimensionamento (Lei de Ohm)</p>
                         <p>Para o cálculo do resistor limitador (\(R_s\)):</p>
                         <ul class="mx-4">
@@ -765,19 +927,24 @@
                             <li>\(R = V_R / I_Z\)</li>
                             <li><strong>Potência:</strong> \(P = V_R \times I_Z\)</li>
                         </ul>
-                        <p><strong>Nota:</strong> Use resistores comerciais (ex.: \(220 \Omega\)) próximos ao calculado.</p>
-                        
+                        <p><strong>Nota:</strong> Use resistores comerciais (ex.: \(220 \Omega\)) próximos ao calculado.
+                        </p>
+
                         <p class="fw-bold fs-5 mt-3">Visualização no Osciloscópio</p>
                         <ul class="mx-4">
                             <li><strong>Antes:</strong> Sinal com ruído ou tensão elevada (ex.: 9V).</li>
                             <li><strong>Depois:</strong> Linha contínua e estável em 5,1V.</li>
                         </ul>
-                        <p>No infográfico a seguir, podemos entender que o Diodo Zener mantém a tensão estável mesmo sob oscilações. Ao atingir a tensão de ruptura (\(V_Z\)), ele opera de forma controlada na polarização reversa, protegendo componentes sensíveis e garantindo precisão ao circuito.</p>
+                        <p>No infográfico a seguir, podemos entender que o Diodo Zener mantém a tensão estável mesmo sob
+                            oscilações. Ao atingir a tensão de ruptura (\(V_Z\)), ele opera de forma controlada na
+                            polarização reversa, protegendo componentes sensíveis e garantindo precisão ao circuito.</p>
                     </div>
                     <div class="formula">\( V_Z = \text{constante} \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="220" data-titulo="Operação do Zener" data-tipo="single" data-msg="Isso!">
-                            <div class="pergunta">Em qual polarização o diodo Zener deve operar para regular a tensão?</div>
+                        <div class="interacao" data-tempo="220" data-titulo="Operação do Zener" data-tipo="single"
+                            data-msg="Isso!">
+                            <div class="pergunta">Em qual polarização o diodo Zener deve operar para regular a tensão?
+                            </div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">Polarização Direta.</div>
                                 <div class="opcao" data-correta="true">Polarização Reversa.</div>
@@ -791,29 +958,38 @@
                     <h1 class="title">Retificadores de onda</h1>
                     <span class="duration">12 min</span>
                     <a class="video" href="https://example.com/sa3e6"></a>
-                    <p class="sinopse">Aprenda a converter corrente alternada em contínua dominando o funcionamento prático dos circuitos retificadores de meia onda e onda completa.</p>
+                    <p class="sinopse">Aprenda a converter corrente alternada em contínua dominando o funcionamento
+                        prático dos circuitos retificadores de meia onda e onda completa.</p>
                     <div class="book-text">
-                        <p>Utilize este guia para realizar as montagens e medições, garantindo a conversão eficiente de corrente alternada (CA) para contínua (CC).</p>
-                        
+                        <p>Utilize este guia para realizar as montagens e medições, garantindo a conversão eficiente de
+                            corrente alternada (CA) para contínua (CC).</p>
+
                         <p class="fw-bold fs-5 mt-3">Simbologia e Polarização</p>
-                        <p>Identifique o catodo pela faixa no corpo do diodo. Posicione-o corretamente na matriz de contato para permitir ou bloquear o fluxo de corrente conforme o semiciclo desejado.</p>
-                        
+                        <p>Identifique o catodo pela faixa no corpo do diodo. Posicione-o corretamente na matriz de
+                            contato para permitir ou bloquear o fluxo de corrente conforme o semiciclo desejado.</p>
+
                         <p class="fw-bold fs-5 mt-3">Transformadores e Osciloscópio</p>
-                        <p>Observe na imagem como a derivação central (center tap) divide a tensão para alimentar os diodos no modelo de onda completa. Use o osciloscópio para comprovar o corte do semiciclo ou a inversão da polaridade.</p>
-                        
+                        <p>Observe na imagem como a derivação central (center tap) divide a tensão para alimentar os
+                            diodos no modelo de onda completa. Use o osciloscópio para comprovar o corte do semiciclo ou
+                            a inversão da polaridade.</p>
+
                         <p class="fw-bold fs-5 mt-3">Cálculo de Tensão Média (Vdc)</p>
                         <ul class="mx-4">
                             <li><strong>Meia Onda:</strong> \(V_{dc} = V_p / \pi\)</li>
                             <li><strong>Onda Completa/Ponte:</strong> \(V_{dc} = 2V_p / \pi\)</li>
                         </ul>
-                        <p><strong>Filtragem Capacitiva:</strong> Após a retificação, o próximo passo é reduzir o ripple (ondulação) citado na teoria para obter uma tensão contínua mais linear e estável.</p>
+                        <p><strong>Filtragem Capacitiva:</strong> Após a retificação, o próximo passo é reduzir o ripple
+                            (ondulação) citado na teoria para obter uma tensão contínua mais linear e estável.</p>
                     </div>
                     <div class="formula">\( V_{dc} = \frac{2V_p}{\pi} \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="240" data-titulo="Retificação Total" data-tipo="single" data-msg="Excelente!">
-                            <div class="pergunta">Qual o benefício do retificador de onda completa em relação ao de meia onda?</div>
+                        <div class="interacao" data-tempo="240" data-titulo="Retificação Total" data-tipo="single"
+                            data-msg="Excelente!">
+                            <div class="pergunta">Qual o benefício do retificador de onda completa em relação ao de meia
+                                onda?</div>
                             <div class="opcoes">
-                                <div class="opcao" data-correta="true">Aproveita os dois semiciclos da onda senoidal.</div>
+                                <div class="opcao" data-correta="true">Aproveita os dois semiciclos da onda senoidal.
+                                </div>
                                 <div class="opcao" data-correta="false">Reduz o número de diodos necessários.</div>
                                 <div class="opcao" data-correta="false">Aumenta a resistência do circuito.</div>
                             </div>
@@ -825,23 +1001,34 @@
                     <h1 class="title">Filtragem capacitiva</h1>
                     <span class="duration">10 min</span>
                     <a class="video" href="https://example.com/sa3e7"></a>
-                    <p class="sinopse">Aprenda a eliminar o ripple e estabilizar fontes de alimentação usando a filtragem capacitiva na prática.</p>
+                    <p class="sinopse">Aprenda a eliminar o ripple e estabilizar fontes de alimentação usando a
+                        filtragem capacitiva na prática.</p>
                     <div class="book-text">
-                        <p>Explore este guia para conectar a teoria da retificação à prática da filtragem, dominando como cada componente transforma sinais instáveis em energia contínua e eficiente para seus projetos.</p>
-                        
+                        <p>Explore este guia para conectar a teoria da retificação à prática da filtragem, dominando
+                            como cada componente transforma sinais instáveis em energia contínua e eficiente para seus
+                            projetos.</p>
+
                         <p class="fw-bold fs-5 mt-3">Processo de Estabilização</p>
                         <ul class="mx-4">
-                            <li><strong>Retificação:</strong> Os diodos transformam a rede AC em uma tensão pulsante, porém instável.</li>
-                            <li><strong>O Filtro:</strong> O capacitor eletrolítico (ex.: 1000µF) atua como um reservatório de energia.</li>
-                            <li><strong>Suavização:</strong> Ao descarregar durante as quedas de tensão, o capacitor "preenche" as lacunas do sinal, reduzindo o Ripple (a oscilação \(\Delta V\)).</li>
-                            <li><strong>Resultado:</strong> A tensão pulsante torna-se uma linha contínua suave (VDC filtrada), garantindo o funcionamento seguro de equipamentos sensíveis.</li>
+                            <li><strong>Retificação:</strong> Os diodos transformam a rede AC em uma tensão pulsante,
+                                porém instável.</li>
+                            <li><strong>O Filtro:</strong> O capacitor eletrolítico (ex.: 1000µF) atua como um
+                                reservatório de energia.</li>
+                            <li><strong>Suavização:</strong> Ao descarregar durante as quedas de tensão, o capacitor
+                                "preenche" as lacunas do sinal, reduzindo o Ripple (a oscilação \(\Delta V\)).</li>
+                            <li><strong>Resultado:</strong> A tensão pulsante torna-se uma linha contínua suave (VDC
+                                filtrada), garantindo o funcionamento seguro de equipamentos sensíveis.</li>
                         </ul>
-                        <p><strong>Dica Prática:</strong> No osciloscópio, observe como o aumento da capacitância "achata" a onda de ripple, aproximando-a da saída ideal. Use este diagrama como mapa para a montagem de sua fonte na bancada!</p>
+                        <p><strong>Dica Prática:</strong> No osciloscópio, observe como o aumento da capacitância
+                            "achata" a onda de ripple, aproximando-a da saída ideal. Use este diagrama como mapa para a
+                            montagem de sua fonte na bancada!</p>
                     </div>
                     <div class="formula">\( Ripple \downarrow as C \uparrow \)</div>
                     <div class="interactive-questions">
-                        <div class="interacao" data-tempo="180" data-titulo="Ripple" data-tipo="single" data-msg="Correto!">
-                            <div class="pergunta">Qual componente é responsável por reduzir a ondulação (ripple) na saída de um retificador?</div>
+                        <div class="interacao" data-tempo="180" data-titulo="Ripple" data-tipo="single"
+                            data-msg="Correto!">
+                            <div class="pergunta">Qual componente é responsável por reduzir a ondulação (ripple) na
+                                saída de um retificador?</div>
                             <div class="opcoes">
                                 <div class="opcao" data-correta="false">Resistor.</div>
                                 <div class="opcao" data-correta="true">Capacitor.</div>
@@ -855,90 +1042,121 @@
                     <h1 class="title">Retificadores trifásicos</h1>
                     <span class="duration">12 min</span>
                     <a class="video" href="https://example.com/sa3e8"></a>
-                    <p class="sinopse">Aprenda a converter tensão alternada trifásica em contínua para garantir eficiência e estabilidade em sistemas industriais de alta potência.</p>
+                    <p class="sinopse">Aprenda a converter tensão alternada trifásica em contínua para garantir
+                        eficiência e estabilidade em sistemas industriais de alta potência.</p>
                     <div class="book-text">
-                        <p>Confira este guia prático e entenda como a ponte de diodos garante a estabilidade necessária para movimentar as grandes indústrias.</p>
-                        
+                        <p>Confira este guia prático e entenda como a ponte de diodos garante a estabilidade necessária
+                            para movimentar as grandes indústrias.</p>
+
                         <p class="fw-bold fs-5 mt-3">O Retificador Trifásico em Foco</p>
                         <ul class="mx-4">
-                            <li><strong>Entrada AC Trifásica:</strong> Observe as fases R, S e T defasadas em 120°. Compreender essa defasagem é vital para entender como os diodos alternam a condução.</li>
-                            <li><strong>Ponte de Graetz:</strong> O diagrama destaca seis diodos de potência organizados em ponte. Identificar essa simbologia é o primeiro passo para interpretar diagramas.</li>
-                            <li><strong>Análise de Sinais:</strong> A imagem mostra a "Tensão de Saída Retificada". Com o uso do osciloscópio, é possível visualizar como o sinal se torna uma linha estável com baixo ripple.</li>
-                            <li><strong>Eficiência Industrial:</strong> A retificação trifásica garante que a tensão não caia a zero, fornecendo potência constante para motores industriais pesados.</li>
+                            <li><strong>Entrada AC Trifásica:</strong> Observe as fases R, S e T defasadas em 120°.
+                                Compreender essa defasagem é vital para entender como os diodos alternam a condução.
+                            </li>
+                            <li><strong>Ponte de Graetz:</strong> O diagrama destaca seis diodos de potência organizados
+                                em ponte. Identificar essa simbologia é o primeiro passo para interpretar diagramas.
+                            </li>
+                            <li><strong>Análise de Sinais:</strong> A imagem mostra a "Tensão de Saída Retificada". Com
+                                o uso do osciloscópio, é possível visualizar como o sinal se torna uma linha estável com
+                                baixo ripple.</li>
+                            <li><strong>Eficiência Industrial:</strong> A retificação trifásica garante que a tensão não
+                                caia a zero, fornecendo potência constante para motores industriais pesados.</li>
                         </ul>
                     </div>
                     <div class="formula">\( \text{Ripple } < 5\% \)</div>
-                    <div class="interactive-questions">
-                        <div class="interacao" data-tempo="200" data-titulo="Ponte Trifásica" data-tipo="single" data-msg="Ótimo!">
-                            <div class="pergunta">Quantos diodos são necessários para uma ponte de Graetz trifásica completa?</div>
-                            <div class="opcoes">
-                                <div class="opcao" data-correta="false">4</div>
-                                <div class="opcao" data-correta="true">6</div>
-                                <div class="opcao" data-correta="false">2</div>
+                            <div class="interactive-questions">
+                                <div class="interacao" data-tempo="200" data-titulo="Ponte Trifásica" data-tipo="single"
+                                    data-msg="Ótimo!">
+                                    <div class="pergunta">Quantos diodos são necessários para uma ponte de Graetz
+                                        trifásica completa?</div>
+                                    <div class="opcoes">
+                                        <div class="opcao" data-correta="false">4</div>
+                                        <div class="opcao" data-correta="true">6</div>
+                                        <div class="opcao" data-correta="false">2</div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
                     </div>
-                </div>
 
-                <div id="s3e9" data-sa="s3" data-num="9" data-type="video" data-ytid="SfCg_1jikNk">
-                    <h1 class="title">Fontes de alimentação</h1>
-                    <span class="duration">15 min</span>
-                    <a class="video" href="https://example.com/sa3e9"></a>
-                    <p class="sinopse">Aprenda a distinguir o funcionamento e as aplicações das fontes lineares e chaveadas, capacitando-se para interpretar seus esquemas e componentes.</p>
-                    <div class="book-text">
-                        <p>Este material resume os pilares das fontes de alimentação, conectando a teoria à prática da bancada:</p>
-                        <ul class="mx-4">
-                            <li><strong>Simbologia e Esquemas:</strong> Fundamental para identificar componentes em diagramas.</li>
-                            <li><strong>Transformadores:</strong> Nas lineares (60Hz), são grandes e pesados; nas chaveadas (alta frequência), são compactos e leves.</li>
-                            <li><strong>Semicondutores:</strong> Diodos realizam a retificação; transistores atuam no chaveamento de alta velocidade.</li>
-                            <li><strong>Reguladores e Calor:</strong> Fontes lineares usam reguladores que dissipam calor, exigindo dissipadores maiores.</li>
-                            <li><strong>Filtros e Ruído:</strong> Capacitores suavizam a tensão. Fontes lineares oferecem menor ruído, ideais para áudio.</li>
-                        </ul>
-                        <p>A imagem a seguir ilustra o funcionamento básico de uma fonte de alimentação e seus principais blocos funcionais.</p>
-                    </div>
-                    <div class="formula">\( P = V \cdot I \)</div>
-                    <div class="interactive-questions">
-                        <div class="interacao" data-tempo="150" data-titulo="Fonte Chaveada" data-tipo="single" data-msg="Isso!">
-                            <div class="pergunta">Qual a principal vantagem da fonte chaveada sobre a linear?</div>
-                            <div class="opcoes">
-                                <div class="opcao" data-correta="true">Maior eficiência e menor tamanho/peso.</div>
-                                <div class="opcao" data-correta="false">Menor ruído elétrico.</div>
-                                <div class="opcao" data-correta="false">Circuito mais simples.</div>
+                    <div id="s3e9" data-sa="s3" data-num="9" data-type="video" data-ytid="SfCg_1jikNk">
+                        <h1 class="title">Fontes de alimentação</h1>
+                        <span class="duration">15 min</span>
+                        <a class="video" href="https://example.com/sa3e9"></a>
+                        <p class="sinopse">Aprenda a distinguir o funcionamento e as aplicações das fontes lineares e
+                            chaveadas, capacitando-se para interpretar seus esquemas e componentes.</p>
+                        <div class="book-text">
+                            <p>Este material resume os pilares das fontes de alimentação, conectando a teoria à prática
+                                da bancada:</p>
+                            <ul class="mx-4">
+                                <li><strong>Simbologia e Esquemas:</strong> Fundamental para identificar componentes em
+                                    diagramas.</li>
+                                <li><strong>Transformadores:</strong> Nas lineares (60Hz), são grandes e pesados; nas
+                                    chaveadas (alta frequência), são compactos e leves.</li>
+                                <li><strong>Semicondutores:</strong> Diodos realizam a retificação; transistores atuam
+                                    no chaveamento de alta velocidade.</li>
+                                <li><strong>Reguladores e Calor:</strong> Fontes lineares usam reguladores que dissipam
+                                    calor, exigindo dissipadores maiores.</li>
+                                <li><strong>Filtros e Ruído:</strong> Capacitores suavizam a tensão. Fontes lineares
+                                    oferecem menor ruído, ideais para áudio.</li>
+                            </ul>
+                            <p>A imagem a seguir ilustra o funcionamento básico de uma fonte de alimentação e seus
+                                principais blocos funcionais.</p>
+                        </div>
+                        <div class="formula">\( P = V \cdot I \)</div>
+                        <div class="interactive-questions">
+                            <div class="interacao" data-tempo="150" data-titulo="Fonte Chaveada" data-tipo="single"
+                                data-msg="Isso!">
+                                <div class="pergunta">Qual a principal vantagem da fonte chaveada sobre a linear?</div>
+                                <div class="opcoes">
+                                    <div class="opcao" data-correta="true">Maior eficiência e menor tamanho/peso.</div>
+                                    <div class="opcao" data-correta="false">Menor ruído elétrico.</div>
+                                    <div class="opcao" data-correta="false">Circuito mais simples.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="s3e10" data-sa="s3" data-num="10" data-type="video" data-ytid="E738SS5QwhU">
-                    <h1 class="title">Fontes variáveis</h1>
-                    <span class="duration">18 min</span>
-                    <a class="video" href="https://example.com/sa3e10"></a>
-                    <p class="sinopse">Aprenda a utilizar o regulador LM317 para garantir total controle e segurança na alimentação de seus circuitos em bancada.</p>
-                    <div class="book-text">
-                        <p>Siga este guia e compreenda como interpretar o esquema elétrico de uma fonte variável, desde a entrada da rede até o ajuste final com o regulador LM317.</p>
-                        
-                        <p class="fw-bold fs-5 mt-3">Fonte Variável</p>
-                        <p>Para converter a rede elétrica em tensão contínua ajustável, seguimos este fluxo:</p>
-                        <ul class="mx-4">
-                            <li><strong>Transformação:</strong> O transformador reduz a alta tensão da rede via indução.</li>
-                            <li><strong>Retificação:</strong> Diodos convertem a corrente alternada (AC) in contínua (DC).</li>
-                            <li><strong>Filtragem:</strong> Capacitores eliminam o ripple, estabilizando o sinal.</li>
-                            <li><strong>Regulação (LM317):</strong> O regulador mantém a saída constante. O ajuste fino ocorre pelo Cálculo de Divisor de Tensão: alterando a resistência no pino de ajuste (ADJ), define-se a voltagem final.</li>
-                        </ul>
-                        <p>Ao seguir cada etapa da redução de tensão no transformador até o ajuste preciso no regulador LM317 você entenderá como garantir segurança e eficiência na alimentação dos seus circuitos.</p>
-                    </div>
-                    <div class="formula">\( V_{out} = 1.25(1 + \frac{R_2}{R_1}) \)</div>
-                    <div class="interactive-questions">
-                        <div class="interacao" data-tempo="200" data-titulo="Regulador Ajustável" data-tipo="single" data-msg="Perfeito!">
-                            <div class="pergunta">Qual componente é comumente usado como regulador de tensão ajustável?</div>
-                            <div class="opcoes">
-                                <div class="opcao" data-correta="false">7805</div>
-                                <div class="opcao" data-correta="true">LM317</div>
-                                <div class="opcao" data-correta="false">1N4007</div>
+                    <div id="s3e10" data-sa="s3" data-num="10" data-type="video" data-ytid="E738SS5QwhU">
+                        <h1 class="title">Fontes variáveis</h1>
+                        <span class="duration">18 min</span>
+                        <a class="video" href="https://example.com/sa3e10"></a>
+                        <p class="sinopse">Aprenda a utilizar o regulador LM317 para garantir total controle e segurança
+                            na alimentação de seus circuitos em bancada.</p>
+                        <div class="book-text">
+                            <p>Siga este guia e compreenda como interpretar o esquema elétrico de uma fonte variável,
+                                desde a entrada da rede até o ajuste final com o regulador LM317.</p>
+
+                            <p class="fw-bold fs-5 mt-3">Fonte Variável</p>
+                            <p>Para converter a rede elétrica em tensão contínua ajustável, seguimos este fluxo:</p>
+                            <ul class="mx-4">
+                                <li><strong>Transformação:</strong> O transformador reduz a alta tensão da rede via
+                                    indução.</li>
+                                <li><strong>Retificação:</strong> Diodos convertem a corrente alternada (AC) in contínua
+                                    (DC).</li>
+                                <li><strong>Filtragem:</strong> Capacitores eliminam o ripple, estabilizando o sinal.
+                                </li>
+                                <li><strong>Regulação (LM317):</strong> O regulador mantém a saída constante. O ajuste
+                                    fino ocorre pelo Cálculo de Divisor de Tensão: alterando a resistência no pino de
+                                    ajuste (ADJ), define-se a voltagem final.</li>
+                            </ul>
+                            <p>Ao seguir cada etapa da redução de tensão no transformador até o ajuste preciso no
+                                regulador LM317 você entenderá como garantir segurança e eficiência na alimentação dos
+                                seus circuitos.</p>
+                        </div>
+                        <div class="formula">\( V_{out} = 1.25(1 + \frac{R_2}{R_1}) \)</div>
+                        <div class="interactive-questions">
+                            <div class="interacao" data-tempo="200" data-titulo="Regulador Ajustável" data-tipo="single"
+                                data-msg="Perfeito!">
+                                <div class="pergunta">Qual componente é comumente usado como regulador de tensão
+                                    ajustável?</div>
+                                <div class="opcoes">
+                                    <div class="opcao" data-correta="false">7805</div>
+                                    <div class="opcao" data-correta="true">LM317</div>
+                                    <div class="opcao" data-correta="false">1N4007</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
             </section>
 
 
@@ -972,21 +1190,25 @@
                         style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; background: var(--bg-color-primary); padding: 5px 0; border-bottom: 1px solid #333; flex-shrink: 0; min-height: 50px; z-index: 101;">
                     </div>
                     <div class="modal-tabs-container" style="flex: 1; position: relative; z-index: 1;">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap px-3 border-bottom border-secondary">
+                        <div
+                            class="d-flex justify-content-between align-items-center flex-wrap px-3 border-bottom border-secondary">
                             <ul class="nav nav-tabs custom-player-tabs border-0" id="playerTab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="synopsis-tab" data-bs-toggle="tab" data-bs-target="#synopsis-pane" type="button"
-                                        role="tab" aria-controls="synopsis-pane" aria-selected="true">Sinopse</button>
+                                    <button class="nav-link active" id="synopsis-tab" data-bs-toggle="tab"
+                                        data-bs-target="#synopsis-pane" type="button" role="tab"
+                                        aria-controls="synopsis-pane" aria-selected="true">Sinopse</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="episodes-tab" data-bs-toggle="tab" data-bs-target="#episodes-pane" type="button" role="tab"
+                                    <button class="nav-link" id="episodes-tab" data-bs-toggle="tab"
+                                        data-bs-target="#episodes-pane" type="button" role="tab"
                                         aria-controls="episodes-pane" aria-selected="false">Episódios</button>
                                 </li>
                             </ul>
 
                             <!-- Botão Próximo Episódio Relocado -->
                             <div id="nextEpisodeBtnContainer" style="display: none;">
-                                <button id="nextEpisodeBtn" class="btn btn-sm btn-outline-danger" onclick="playNextEpisode()">
+                                <button id="nextEpisodeBtn" class="btn btn-sm btn-outline-danger"
+                                    onclick="playNextEpisode()">
                                     Próximo Episódio <i class="bx bx-skip-next-circle"></i>
                                 </button>
                             </div>
@@ -994,11 +1216,13 @@
 
                         <div class="tab-content player-tab-content p-4" id="playerTabContent">
                             <!-- Aba Sinopse -->
-                            <div class="tab-pane fade show active" id="synopsis-pane" role="tabpanel" aria-labelledby="synopsis-tab" tabindex="0">
+                            <div class="tab-pane fade show active" id="synopsis-pane" role="tabpanel"
+                                aria-labelledby="synopsis-tab" tabindex="0">
                                 <div id="currentEpisodeSynopsis"></div>
                             </div>
                             <!-- Aba Episódios -->
-                            <div class="tab-pane fade" id="episodes-pane" role="tabpanel" aria-labelledby="episodes-tab" tabindex="0">
+                            <div class="tab-pane fade" id="episodes-pane" role="tabpanel" aria-labelledby="episodes-tab"
+                                tabindex="0">
                                 <div id="fullEpisodesList" class="playlist-vertical"></div>
                             </div>
                         </div>
@@ -1011,14 +1235,16 @@
                 style="background-color: rgba(0,0,0,0.95); z-index: 99990; transition: opacity 0.3s ease;">
                 <div class="bg-dark rounded-3 p-4 p-md-5 overflow-auto position-relative shadow-lg"
                     style="width: 90%; max-width: 1100px; height: 85vh;">
-                    <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4">
+                    <div
+                        class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4">
                         <h2 class="h2 m-0 text-white">Central de Conhecimento</h2>
                         <button onclick="closeDetails()" class="btn btn-link text-white p-0 fs-1 lh-1">×</button>
                     </div>
 
                     <div class="mb-4">
                         <label class="me-2 text-secondary">Filtrar por:</label>
-                        <select id="detailsSeasonSelect" onchange="filterDetailsGrid()" class="bg-secondary text-white border-0 p-2 rounded">
+                        <select id="detailsSeasonSelect" onchange="filterDetailsGrid()"
+                            class="bg-secondary text-white border-0 p-2 rounded">
                             <option value="s1">Fundamentos da Eletrônica</option>
                             <option value="s2">Sinais Alternados e Transformadores</option>
                             <option value="s3">Semicondutores e Fontes de Alimentação</option>
@@ -1038,7 +1264,8 @@
                         class="btn btn-link text-secondary p-0 fs-1 lh-1 position-absolute top-0 end-0 mt-2 me-4 z-3">×</button>
 
                     <div class="flex-grow-1 p-4 p-md-5 overflow-auto">
-                        <div class="small text-uppercase ls-lg text-secondary mb-1 fw-bold" style="letter-spacing: 2px;">Briefing Técnico
+                        <div class="small text-uppercase ls-lg text-secondary mb-1 fw-bold"
+                            style="letter-spacing: 2px;">Briefing Técnico
                         </div>
                         <h1 id="bookTitle" class="h2 fw-bold mb-4 pb-3 border-bottom border-warning border-3 text-dark">
                             Título do Assunto
@@ -1047,20 +1274,23 @@
                         <div class="row g-4">
                             <div class="col-lg-8">
                                 <div id="bookText" class="fs-5 lh-base text-justify"></div>
-                                <div class="mt-4 p-3 bg-white border-start border-warning border-4 fst-italic text-secondary">
+                                <div
+                                    class="mt-4 p-3 bg-white border-start border-warning border-4 fst-italic text-secondary">
                                     "A teoria guia, a
                                     prática confirma."</div>
                             </div>
 
                             <div class="col-lg-4 d-flex flex-column gap-4">
                                 <div class="bg-white border p-2 text-center">
-                                    <img id="bookImage" src="" class="img-fluid rounded mb-2" style="max-height: 200px; object-fit: contain; display: none;"
+                                    <img id="bookImage" src="" class="img-fluid rounded mb-2"
+                                        style="max-height: 200px; object-fit: contain; display: none;"
                                         onerror="this.style.display='none'">
                                     <div class="small text-muted">Referência</div>
                                 </div>
                                 <div class="bg-white border border-dark border-2 p-4 text-center">
                                     <div class="small fw-bold text-uppercase mb-2">ELEMENTO CHAVE</div>
-                                    <div id="bookFormula" class="h3 fw-bold text-warning font-serif" style="font-family: 'Times New Roman', serif;">
+                                    <div id="bookFormula" class="h3 fw-bold text-warning font-serif"
+                                        style="font-family: 'Times New Roman', serif;">
                                     </div>
                                 </div>
                             </div>

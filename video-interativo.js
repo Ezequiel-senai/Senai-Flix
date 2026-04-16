@@ -1,7 +1,6 @@
 /**
  * SISTEMA DE VÍDEO INTERATIVO UNIVERSAL
  * Suporta: YouTube, Relink, Videolib (HLS)
- * Compatível com aula2.html e aula3.html
  */
 
 class VideoInterativoUniversal {

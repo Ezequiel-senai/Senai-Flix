@@ -4267,3 +4267,26 @@ body.theme-1 #icon-sun {
 .material-icons{
   color: #ffffff !important;
 }
+/* 
+Mathjax
+*/
+
+/* Remove sombras e forças a borda a ser única e sólida */
+mjx-frac>span {
+  border-top: none !important;
+  border-bottom: 0.06em solid !important;
+  /* Força a espessura padrão do traço */
+  display: block !important;
+  height: 0 !important;
+  padding: 0 !important;
+}
+
+/* Evita que o container principal adicione bordas fantasmas */
+mjx-container[jax="CHTML"] {
+  outline: none !important;
+}
+
+/* Ajuste fino para o alinhamento do traço */
+mjx-frac {
+  margin: 0 0.1em !important;
+}
