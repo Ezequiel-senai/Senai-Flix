@@ -1118,6 +1118,11 @@ class VideoInterativoUniversal {
         }
 
         if (btnContinue) btnContinue.style.display = 'inline-block';
+        
+        // Re-renderizar MathJax se houver fórmulas no feedback
+        if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+            window.MathJax.typesetPromise([overlayEl]);
+        }
         // O listener de clique no btnContinue já foi configurado no openQuestion.
     }
 
