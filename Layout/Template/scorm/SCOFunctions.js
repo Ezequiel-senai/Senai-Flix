@@ -16,7 +16,7 @@ function loadPage() {
 
   if (status == "not attempted") {
     // the student is now attempting the lesson
-    LMSGetValue("cmi.core.lesson_status", "incomplete");
+    doLMSSetValue("cmi.core.lesson_status", "incomplete");
   }
 
   exitPageStatus = false;
@@ -481,6 +481,7 @@ if (resumeFromLastButton) {
     bootstrap.Modal.getOrCreateInstance("#resumeFromLastModal").hide();
   }
 });
+}
 
 if (resumeFromBeginning) {
     resumeFromBeginning.addEventListener("click", () => {
