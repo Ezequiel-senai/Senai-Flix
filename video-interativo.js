@@ -292,6 +292,9 @@ class VideoInterativoUniversal {
             if (this.youtubePlayer && typeof this.youtubePlayer.getCurrentTime === 'function') {
                  this.saveProgress(this.youtubePlayer.getCurrentTime());
             }
+        } else if (event.data === window.YT.PlayerState.ENDED) {
+            console.log('[VideoInterativo] Vídeo YouTube finalizado.');
+            this.handleVideoEnded();
         }
         this.updateTime();
     }
@@ -366,6 +369,11 @@ class VideoInterativoUniversal {
 
             this.hls.loadSource(url);
             this.hls.attachMedia(this.video);
+            
+            this.video.onended = () => {
+                console.log('[VideoInterativo] Vídeo HLS finalizado.');
+                this.handleVideoEnded();
+            };
 
             // Ouvinte de Erros HLS
             this.hls.on(window.Hls.Events.ERROR, (event, data) => {
@@ -857,7 +865,15 @@ class VideoInterativoUniversal {
         }
 
         this.checkInteractions();
-        this.saveProgress(currentTime);
+        
+        // Salvar progresso a cada 10 segundos para evitar sobrecarga (10000ms / 100ms interval = 100 ticks)
+        if (!this._saveCounter) this._saveCounter = 0;
+        this._saveCounter++;
+        if (this._saveCounter >= 100) { 
+            console.log(`[VideoInterativo] Salvamento automático de progresso aos ${currentTime}s`);
+            this.saveProgress(currentTime);
+            this._saveCounter = 0;
+        }
     }
 
     updateVolumeIcon(vol) {
@@ -880,17 +896,18 @@ class VideoInterativoUniversal {
     }
 
     checkInteractions() {
+        const exactTime = this.youtubePlayer ? this.youtubePlayer.getCurrentTime() : (this.video ? this.video.currentTime : 0);
+        const currentTime = Math.floor(exactTime);
         const interactiveOverlay = document.getElementById('interactiveOverlay');
+        
         if (interactiveOverlay && interactiveOverlay.style.display === 'flex') return;
+        
+        // Evita re-abrir a mesma interação se acabamos de fechá-la e o vídeo ainda não andou
+        if (this.lastTriggeredTime === currentTime) return;
 
-        const currentTime = this.youtubePlayer ? 
-            this.youtubePlayer.getCurrentTime() : 
-            (this.video ? this.video.currentTime : 0);
-
-        const now = Math.floor(currentTime);
         // Exibe ao passar pelo tempo normalmente na reprodução contínua (se não finalizada). 
         // Interações já finalizadas aparecem quando requisitadas via clique (jumpTo).
-        const index = this.config.interacoes.findIndex(i => i.tempo === now && !i.respondida);
+        const index = this.config.interacoes.findIndex(i => i.tempo === currentTime && !i.respondida);
         
         if (index !== -1) {
             const acao = this.config.interacoes[index];
@@ -966,6 +983,7 @@ class VideoInterativoUniversal {
             <div class="row py-3 js-exercise w-100 h-100 d-flex align-items-center justify-content-center" data-type="single" style="margin: 0; padding: 20px; position: absolute; top:0; left:0; z-index: 1000;">
                 <div class="col-lg-8 mx-auto py-5 border rounded" style="background-color: var(--bg-primary, #ffffff); box-shadow: 0 10px 40px rgba(0,0,0,0.5); border-radius: 12px; margin-top: 5vh; max-height: 80vh; overflow-y: auto;">
                     <div class="m-3 text-center">
+                        <div class="text-danger small fw-bold text-uppercase mb-1" style="letter-spacing: 1px;">${this.config.title}</div>
                         <h4 style="color:#222; font-weight:700; margin-bottom: 20px; font-size: 1.5rem;">${dados.pergunta || 'Responda a questão para continuar'}</h4>
                     </div>
                     <div class="list-group m-3 gap-2" id="qOptionsContainer">
@@ -990,13 +1008,21 @@ class VideoInterativoUniversal {
                     
                     <div class="mt-4 d-flex flex-column flex-sm-row justify-content-center gap-3 px-3">
                         ${!jaRespondida ? `<button id="btnConfirmQuestion" class="btn btn-primary text-black btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:none; max-width: 300px; margin: 0 auto;">Confirmar</button>` : ''}
-                        <button id="btnContinueVideo" class="btn ${jaRespondida ? 'btn-success' : 'btn-primary text-black '} btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:${jaRespondida ? 'inline-block' : 'none'}; max-width: 300px; margin: 0 auto;">Continuar Vídeo <i class="bx bx-play-circle ms-2"></i></button>
+                        <button id="btnContinueVideo" class="btn ${jaRespondida ? 'btn-success' : 'btn-outline-primary'} btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:inline-block; max-width: 300px; margin: 0 auto;">
+                            ${jaRespondida ? 'Continuar Vídeo' : 'Continuar sem responder'} <i class="bx bx-play-circle ms-2"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         `;
 
         interactiveOverlay.style.display = 'flex';
+        document.body.classList.add('lock-scroll');
+        const modalContent = document.querySelector('.video-modal-content');
+        if (modalContent) modalContent.classList.add('lock-scroll');
+
+        this.lastTriggeredTime = Math.floor(this.youtubePlayer ? this.youtubePlayer.getCurrentTime() : this.video.currentTime);
+        console.log(`[VideoInterativo] Abrindo interação no tempo: ${this.lastTriggeredTime}s`);
 
         // Renderizar Fórmulas (MathJax)
         if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
@@ -1010,6 +1036,9 @@ class VideoInterativoUniversal {
         // Lógica de Continuar (Unificada)
         const handleContinue = () => {
             interactiveOverlay.style.display = 'none';
+            document.body.classList.remove('lock-scroll');
+            const modalContent = document.querySelector('.video-modal-content');
+            if (modalContent) modalContent.classList.remove('lock-scroll');
             this.isLocked = false;
 
             // Retomar o vídeo de forma robusta
@@ -1063,6 +1092,19 @@ class VideoInterativoUniversal {
                 const optIndex = parseInt(selectedRadio.value);
                 const objOpcao = dados.opcoes[optIndex];
                 this.showFeedback(objOpcao, index, interactiveOverlay);
+                
+                // Forçar salvamento do estado da interação
+                this.saveProgress(this.youtubePlayer ? this.youtubePlayer.getCurrentTime() : this.video.currentTime);
+                
+                // Atualizar Nota Global no LMS
+                if (typeof updateLMSScore === 'function') {
+                    updateLMSScore();
+                }
+
+                // LIBERAR SCROLL IMEDIATAMENTE APÓS RESPONDER
+                document.body.classList.remove('lock-scroll');
+                const modalContent = document.querySelector('.video-modal-content');
+                if (modalContent) modalContent.classList.remove('lock-scroll');
 
                 // Esconder botão confirmar, mostrar botão continuar
                 btnConfirm.style.display = 'none';
@@ -1280,6 +1322,13 @@ class VideoInterativoUniversal {
             }
         }
 
+        // Prioridade Total para tempo forçado (ex: vindo do relatório)
+        if (this.config.startTime && this.config.startTime > 0) {
+            console.log(`[VideoInterativo] Iniciando em tempo forçado: ${this.config.startTime}s`);
+            this.jumpTo(this.config.startTime);
+            return;
+        }
+
         // Aplicar dados restaurados
         if (data) {
             // Suporte legado
@@ -1371,6 +1420,27 @@ class VideoInterativoUniversal {
         const overlay = document.getElementById('interactiveOverlay');
         if (overlay) {
             overlay.remove();
+            document.body.classList.remove('lock-scroll');
+            const modalContent = document.querySelector('.video-modal-content');
+            if (modalContent) modalContent.classList.remove('lock-scroll');
+        }
+    }
+
+    /**
+     * Verifica se o curso foi concluído e dispara o relatório
+     */
+    handleVideoEnded() {
+        if (!window.episodesData || window.episodesData.length === 0) return;
+
+        // Encontrar o último episódio válido (ignorando especiais se necessário)
+        const validEpisodes = window.episodesData.filter(ep => !ep.special);
+        const lastEpisode = validEpisodes[validEpisodes.length - 1];
+
+        if (lastEpisode && lastEpisode.id === this.config.videoId) {
+            console.log('[VideoInterativo] Último episódio do curso finalizado!');
+            if (this.config.onCourseEnded) {
+                this.config.onCourseEnded();
+            }
         }
     }
 }

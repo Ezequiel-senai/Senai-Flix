@@ -1998,15 +1998,95 @@ body.theme-2 #senai-player-wrapper {
   height: 90vh;
   position: relative;
   background: var(--bg-color-primary) !important;
-  border-radius: 8px;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  /* Vertical layout */
-    margin: 5vh auto;
-    overflow-y: auto;
-    /* Content scroller */
-    scroll-behavior: smooth;
+  border-radius: 12px;
+  overflow-y: auto; /* Permite scroll do conteúdo (sinopse/playlist) */
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+  margin: 5vh auto;
+  scroll-behavior: smooth;
+}
+
+.lock-scroll {
+  overflow: hidden !important;
+}
+
+/* Modal de Retomada - Tematização */
+body.theme-1 #resumeFromLastModal .modal-content { background-color: #ffffff; color: #333; }
+body.theme-2 #resumeFromLastModal .modal-content { background-color: #1a1a1a; color: #ffffff; }
+body.theme-3 #resumeFromLastModal .modal-content { background-color: #808080; color: #ffffff; }
+body.theme-4 #resumeFromLastModal .modal-content { background-color: #ffff00; color: #000000; }
+
+body.theme-1 #resumeFromLastModal .btn-close { filter: none; }
+body.theme-2 #resumeFromLastModal .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+body.theme-3 #resumeFromLastModal .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+body.theme-4 #resumeFromLastModal .btn-close { filter: none; }
+
+/* Modal de Conclusão - Tematização */
+body.theme-1 #courseCompletionModal .modal-content { background-color: #ffffff; color: #333; }
+body.theme-2 #courseCompletionModal .modal-content { background-color: #1a1a1a; color: #ffffff; }
+body.theme-3 #courseCompletionModal .modal-content { background-color: #808080; color: #ffffff; }
+body.theme-4 #courseCompletionModal .modal-content { background-color: #ffff00; color: #000000; }
+
+body.theme-1 #courseCompletionModal .btn-close { filter: none; }
+body.theme-2 #courseCompletionModal .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+body.theme-3 #courseCompletionModal .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+body.theme-4 #courseCompletionModal .btn-close { filter: none; }
+
+body.theme-1 #courseCompletionModal .accordion-button { color: #333; }
+body.theme-2 #courseCompletionModal .accordion-button { color: #ffffff; }
+body.theme-3 #courseCompletionModal .accordion-button { color: #ffffff; }
+body.theme-4 #courseCompletionModal .accordion-button { color: #000000; }
+
+/* Forçar cores de texto no modal para temas escuros */
+body.theme-2 #courseCompletionModal h2,
+body.theme-2 #courseCompletionModal h3,
+body.theme-2 #courseCompletionModal h5,
+body.theme-2 #courseCompletionModal h6,
+body.theme-2 #courseCompletionModal p,
+body.theme-2 #courseCompletionModal .text-muted {
+    color: #ffffff !important;
+}
+
+body.theme-3 #courseCompletionModal h2,
+body.theme-3 #courseCompletionModal h3,
+body.theme-3 #courseCompletionModal h5,
+body.theme-3 #courseCompletionModal h6,
+body.theme-3 #courseCompletionModal p,
+body.theme-3 #courseCompletionModal .text-muted {
+    color: #ffffff !important;
+}
+
+/* Container do botão de relatório na playlist */
+body.theme-2 .report-completion-container h5,
+body.theme-2 .report-completion-container p {
+    color: #ffffff !important;
+}
+
+body.theme-3 .report-completion-container h5,
+body.theme-3 .report-completion-container p {
+    color: #ffffff !important;
+}
+
+/* Tema 1 (Claro) - Ajustes específicos */
+body.theme-1 .report-completion-container {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6 !important;
+}
+body.theme-1 .report-completion-container h5,
+body.theme-1 .report-completion-container p {
+    color: #333333 !important;
+}
+
+body.theme-1 #courseCompletionModal .accordion-button,
+body.theme-1 #courseCompletionModal .fw-bold,
+body.theme-1 #courseCompletionModal .text-muted,
+body.theme-1 #courseCompletionModal li {
+    color: #333333 !important;
+}
+
+body.theme-1 #courseCompletionModal .accordion-button::after {
+    filter: brightness(0); /* Seta do accordion preta */
 }
 
 .sticky-player-container {

@@ -77,24 +77,7 @@
         </div>
         <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
         <script>
-            new window.VLibras.Widget('https://vlibras.gov.br/app');
-
-            // Sincroniza Season Selector com SCORM
-            const selector = document.getElementById('seasonSelector');
-            if (selector) {
-                // Restaurar temporada
-                const lastSeason = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastSeason') : localStorage.getItem('lastSeason');
-                if (lastSeason) selector.value = lastSeason;
-
-                selector.addEventListener('change', () => {
-                    if (typeof setSuspendDataValue === 'function') {
-                        setSuspendDataValue('lastSeason', selector.value);
-                    } else {
-                        localStorage.setItem('lastSeason', selector.value);
-                    }
-                    changeSeason();
-                });
-            }
+                new window.VLibras.Widget('https://vlibras.gov.br/app');
         </script>
         <!-- Menu -->
         <!-- Navegação Flutuante Lateral Glass (Animada) -->
@@ -188,12 +171,6 @@
                         teoria encontra a prática industrial.
                     </p>
 
-                    <div class="hero-buttons">
-                        <button id="heroPlayBtn" onclick="playFirstEpisode()">
-                            <span class="text-black"> <i class="bx bx-play text-black" title="play"></i></span> <span
-                                class="text-black" id="heroPlayBtnText">Começar</span>
-                        </button>
-                    </div>
                     <!-- Botão Fullscreen Relocado -->
                     <div class="mt-4">
                         <button class="btn btn-outline border rounded d-flex align-items-center gap-2"
@@ -258,7 +235,7 @@
                                         <div class="row">
                                             <h3>Dica</h3>
 
-                                            <p class="mt-3"><strong>Dica:</strong> o símbolo \(I\) representa a
+                                            <p class="mt-3">O símbolo \(I\) representa a
                                                 intensidade da corrente
                                                 elétrica. Ele representa a
                                                 "coisa" que está fluindo pelo fio, enquanto \(A\) representa a unidade
@@ -284,8 +261,8 @@
                             fio solta, a
                             resistência isola o caminho e o
                             fluxo elétrico cessa.</p>
-                            <p>\[\mathbf{600mA = \frac{600}{1000}A = 0.6A}\]</p>
-                            <p class="mt-3"><em>Fonte: Elaborada pelo autor com auxílio de IA (2026).</em></p>
+                        <p>\[600mA = \frac{600}{1000}A = 0.6A\]</p>
+                        <p class="mt-3"><em>Fonte: Elaborada pelo autor com auxílio de IA (2026).</em></p>
                     </div>
 
                     <div class="interactive-questions">
@@ -506,9 +483,11 @@
                         <p class="fw-bold mt-3">Unidades e medidas</p>
                         <p>Atenção às conversões para preencher as tabelas corretamente:</p>
                         <ul class="mx-4">
-                            <li><strong>Miliampere (\(mA\)):</strong> divida por 1.000 para obter ampere (A). Exemplo: \(220mA
+                            <li><strong>Miliampere (\(mA\)):</strong> divida por 1.000 para obter ampere (A). Exemplo:
+                                \(220mA
                                 = 0,22A\);</li>
-                            <li><strong>Quilo-Ohm (\(k\Omega\)):</strong> multiplique por 1.000 para obter Ohm (\(\Omega\)).</li>
+                            <li><strong>Quilo-Ohm (\(k\Omega\)):</strong> multiplique por 1.000 para obter Ohm
+                                (\(\Omega\)).</li>
                         </ul>
 
                         <p class="fw-bold mt-3">Teoria e prática</p>
@@ -586,7 +565,7 @@
                                             <h3>Dica</h3>
                                             <p>converta sempre os resultados (exemplo: \(0.068A = 68mA\)) para leitura
                                                 correta no simulador.</p>
-                                        
+
                                         </div>
                                     </div>
                                     <div class="col-lg-2 ">
@@ -597,7 +576,8 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="mt-3">Confira o passo a passo matemático para dominar a análise de circuitos paralelos. Aprenda a calcular
+                        <p class="mt-3">Confira o passo a passo matemático para dominar a análise de circuitos
+                            paralelos. Aprenda a calcular
                             correntes e resistências, validando a 1ª lei de Kirchhoff antes da simulação.</p>
 
                     </div>
@@ -640,7 +620,9 @@
                         <ul class="mx-4">
                             <li>Configure a escala correta no multímetro.</li>
                             <li>Meça <strong>resistência</strong> com o circuito desenergizado.</li>
-                            <li>Conferidas a polaridade das pontas de prova ao medir <strong>tensão</strong> e <strong>corrente</strong>.</li>
+                            <li>Conferidas a polaridade das pontas de prova ao medir <strong>tensão</strong> e
+                                <strong>corrente</strong>.
+                            </li>
                         </ul>
                         <div class="col-lg-12 mx-auto py-5">
                             <div class="box dica">
@@ -654,7 +636,7 @@
                                             <p>A estimativa teórica evita danos ao multímetro e
                                                 erros de
                                                 interpretação.
-                                                </p>
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="col-lg-2 ">
@@ -713,11 +695,12 @@
                             <li><strong>\(V_p\) (pico):</strong> valor máximo da onda.</li>
                             <li><strong>\(f\) (frequência):</strong> Ciclos por segundo (Hz).</li>
                             <li>
-                                <strong>Cálculo essencial:</strong> para obter o valor eficaz, use: \(V_{rms} = \frac{V_p}{\sqrt{2}}\).
+                                <strong>Cálculo essencial:</strong> para obter o valor eficaz, use: \(V_{rms} =
+                                \frac{V_p}{\sqrt{2}}\).
                             </li>
                         </ul>
 
-                    
+
 
                         <p class="fw-bold mt-3">Indução e transformadores</p>
                         <p>A flexibilização entre valores de tensão e corrente ocorre via indução eletromagnética.
@@ -763,8 +746,10 @@
                             circuitos indutivos em corrente alternada.</p>
 
                         <p class="fw-bold mt-3">Indutores em AC</p>
-                        <p>Para calcular a reatância do indutor à passagem da corrente, utilize a fórmula da <strong>reatância
-                                indutiva</strong>:</p>
+                        <p>Para calcular a reatância do indutor à passagem da corrente, utilize a fórmula da
+                            <strong>reatância
+                                indutiva</strong>:
+                        </p>
                         <p>\[X_l = 2\pi \cdot f \cdot L\]</p>
 
                         <p class="fw-bold mt-3">Análise do circuito RL</p>
@@ -775,8 +760,10 @@
 
                         <p class="fw-bold mt-3">Procedimento de medição</p>
                         <ul class="mx-4">
-                            <li>Ajuste o <strong>gerador de sinais</strong> para a tensão e frequências indicadas no experimento.</li>
-                            <li>Utilize o <strong>multímetro</strong> para medir as quedas de tensão e validar a relação entre teoria e
+                            <li>Ajuste o <strong>gerador de sinais</strong> para a tensão e frequências indicadas no
+                                experimento.</li>
+                            <li>Utilize o <strong>multímetro</strong> para medir as quedas de tensão e validar a relação
+                                entre teoria e
                                 prática.</li>
                         </ul>
 
@@ -800,12 +787,12 @@
                                                 reatância e a impedância
                                                 do circuito RL analisado.</p>
                                         </div>
-                                            </div>
-                                        <div class="col-lg-2 ">
-                                    <div class="d-flex d-none d-sm-block d-md-block d-lg-block">
-                                        <i class='bx bx-bulb laranja-dica bx-tada'></i>
                                     </div>
-                                </div>
+                                    <div class="col-lg-2 ">
+                                        <div class="d-flex d-none d-sm-block d-md-block d-lg-block">
+                                            <i class='bx bx-bulb laranja-dica bx-tada'></i>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -925,7 +912,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+            
 
                 <div id="s3e2" data-sa="s3" data-num="2" data-type="video" data-ytid="18hdDSUlM30">
                     <h1 class="title">Diodos retificadores</h1>
@@ -1262,44 +1249,45 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div id="s3e8" data-sa="s3" data-num="8" data-type="video" data-ytid="jmLLKZxzEno">
-                        <h1 class="title">Retificadores trifásicos</h1>
-                        <span class="duration">12 min</span>
-                        <a class="video" href="https://example.com/sa3e8"></a>
-                        <p class="sinopse">Converta tensão alternada (AC) trifásica em contínua (DC) para garantir
-                            eficiência e estabilidade em
-                            sistemas industriais de alta potência.</p>
-                        <div class="book-text">
-                            <p>Confira este guia prático e entenda como a ponte de diodos garante a estabilidade
-                                necessária
-                                para alimentar
-                                equipamentos nas grandes indústrias.</p>
+                <div id="s3e8" data-sa="s3" data-num="8" data-type="video" data-ytid="jmLLKZxzEno">
+                    <h1 class="title">Retificadores trifásicos</h1>
+                    <span class="duration">12 min</span>
+                    <a class="video" href="https://example.com/sa3e8"></a>
+                    <p class="sinopse">Converta tensão alternada (AC) trifásica em contínua (DC) para garantir
+                        eficiência e estabilidade em
+                        sistemas industriais de alta potência.</p>
+                    <div class="book-text">
+                        <p>Confira este guia prático e entenda como a ponte de diodos garante a estabilidade
+                            necessária
+                            para alimentar
+                            equipamentos nas grandes indústrias.</p>
 
-                            <p class="fw-bold mt-3">O retificador trifásico em foco</p>
-                            <p>Acompanhe os pontos principais para entender o circuito apresentado na imagem:</p>
-                            <ul class="mx-4">
-                                <li><strong>Entrada AC trifásica:</strong> observe as fases R, S e T defasadas em 120°.
-                                    Compreender essa defasagem é
-                                    vital para entender como os diodos alternam a condução para converter o sinal
-                                    alternado
-                                    em contínuo;</li>
-                                <li><strong>Ponte de Graetz:</strong> o diagrama destaca seis diodos de potência
-                                    organizados
-                                    em ponte. Identificar essa
-                                    simbologia é o primeiro passo para interpretar diagramas e realizar a montagem
-                                    física do
-                                    circuito;</li>
-                                <li><strong>Análise de sinais:</strong> a imagem mostra a "Tensão de Saída Retificada".
-                                    Com
-                                    o uso do osciloscópio, é
-                                    possível visualizar como o sinal se torna uma linha estável, com baixíssimo nível de
-                                    ondulação (ripple);</li>
-                                <li><strong>Eficiência:</strong> a retificação trifásica garante que a tensão não caia a
-                                    zero, fornecendo a potência
-                                    constante necessária para alimentar motores e máquinas industriais pesadas.</li>
-                            </ul>
-                            <p class="mt-3"><em>Fonte: Elaborada pelo autor com auxílio de IA (2026).</em></p>
+                        <p class="fw-bold mt-3">O retificador trifásico em foco</p>
+                        <p>Acompanhe os pontos principais para entender o circuito apresentado na imagem:</p>
+                        <ul class="mx-4">
+                            <li><strong>Entrada AC trifásica:</strong> observe as fases R, S e T defasadas em 120°.
+                                Compreender essa defasagem é
+                                vital para entender como os diodos alternam a condução para converter o sinal
+                                alternado
+                                em contínuo;</li>
+                            <li><strong>Ponte de Graetz:</strong> o diagrama destaca seis diodos de potência
+                                organizados
+                                em ponte. Identificar essa
+                                simbologia é o primeiro passo para interpretar diagramas e realizar a montagem
+                                física do
+                                circuito;</li>
+                            <li><strong>Análise de sinais:</strong> a imagem mostra a "Tensão de Saída Retificada".
+                                Com
+                                o uso do osciloscópio, é
+                                possível visualizar como o sinal se torna uma linha estável, com baixíssimo nível de
+                                ondulação (ripple);</li>
+                            <li><strong>Eficiência:</strong> a retificação trifásica garante que a tensão não caia a
+                                zero, fornecendo a potência
+                                constante necessária para alimentar motores e máquinas industriais pesadas.</li>
+                        </ul>
+                        <p class="mt-3"><em>Fonte: Elaborada pelo autor com auxílio de IA (2026).</em></p>
                         </div>
                         <div class="formula">\( \text{Ripple } < 5\% \)</div>
                                 <div class="interactive-questions">
@@ -1315,127 +1303,126 @@
                                     </div>
                                 </div>
                         </div>
+                    </div>
 
-                        <div id="s3e9" data-sa="s3" data-num="9" data-type="video" data-ytid="SfCg_1jikNk">
-                            <h1 class="title">Fontes de alimentação</h1>
-                            <span class="duration">15 min</span>
-                            <a class="video" href="https://example.com/sa3e9"></a>
-                            <p class="sinopse">Entenda como distinguir o funcionamento e as aplicações das fontes
-                                lineares e
-                                chaveadas,
-                                capacitando-se para interpretar seus esquemas e componentes.</p>
-                            <div class="book-text">
-                                <p>Este material resume os pilares das fontes de alimentação, conectando a teoria à
-                                    prática
-                                    da bancada:</p>
-                                <ul class="mx-4">
-                                    <li><strong>Simbologia e esquemas:</strong> fundamental para identificar componentes
-                                        em
-                                        diagramas;</li>
-                                    <li><strong>Transformadores:</strong> nas fontes lineares (60Hz), são grandes e
-                                        pesados;
-                                        nas chaveadas, são compactos e
-                                        leves;</li>
-                                    <li><strong>Semicondutores:</strong> diodos realizam a retificação; transistores
-                                        atuam
-                                        no chaveamento nas fontes
-                                        chaveadas;</li>
-                                    <li><strong>Filtros e ruído:</strong> capacitores suavizam a tensão. Fontes
-                                        chaveadas
-                                        oferecem menor ruído, sendo ideais
-                                        para áudio e medição.</li>
-                                </ul>
-                                <p class="mt-3">A imagem a seguir ilustra o funcionamento básico de uma fonte de
-                                    alimentação
-                                    e seus principais blocos
-                                    funcionais.</p>
-                            </div>
-                            <div class="formula">\( P = V \cdot I \)</div>
-                            <div class="interactive-questions">
-                                <div class="interacao" data-tempo="150" data-titulo="Fonte Chaveada" data-tipo="single"
-                                    data-msg="Isso!">
-                                    <div class="pergunta">Qual a principal vantagem da fonte chaveada sobre a linear?
+                    <div id="s3e9" data-sa="s3" data-num="9" data-type="video" data-ytid="SfCg_1jikNk">
+                        <h1 class="title">Fontes de alimentação</h1>
+                        <span class="duration">15 min</span>
+                        <a class="video" href="https://example.com/sa3e9"></a>
+                        <p class="sinopse">Entenda como distinguir o funcionamento e as aplicações das fontes
+                            lineares e
+                            chaveadas,
+                            capacitando-se para interpretar seus esquemas e componentes.</p>
+                        <div class="book-text">
+                            <p>Este material resume os pilares das fontes de alimentação, conectando a teoria à
+                                prática
+                                da bancada:</p>
+                            <ul class="mx-4">
+                                <li><strong>Simbologia e esquemas:</strong> fundamental para identificar componentes
+                                    em
+                                    diagramas;</li>
+                                <li><strong>Transformadores:</strong> nas fontes lineares (60Hz), são grandes e
+                                    pesados;
+                                    nas chaveadas, são compactos e
+                                    leves;</li>
+                                <li><strong>Semicondutores:</strong> diodos realizam a retificação; transistores
+                                    atuam
+                                    no chaveamento nas fontes
+                                    chaveadas;</li>
+                                <li><strong>Filtros e ruído:</strong> capacitores suavizam a tensão. Fontes
+                                    chaveadas
+                                    oferecem menor ruído, sendo ideais
+                                    para áudio e medição.</li>
+                            </ul>
+                            <p class="mt-3">A imagem a seguir ilustra o funcionamento básico de uma fonte de
+                                alimentação
+                                e seus principais blocos
+                                funcionais.</p>
+                        </div>
+                        <div class="formula">\( P = V \cdot I \)</div>
+                        <div class="interactive-questions">
+                            <div class="interacao" data-tempo="150" data-titulo="Fonte Chaveada" data-tipo="single" data-msg="Isso!">
+                                <div class="pergunta">Qual a principal vantagem da fonte chaveada sobre a linear?
+                                </div>
+                                <div class="opcoes">
+                                    <div class="opcao" data-correta="true">Maior eficiência e menor tamanho/peso.
                                     </div>
-                                    <div class="opcoes">
-                                        <div class="opcao" data-correta="true">Maior eficiência e menor tamanho/peso.
-                                        </div>
-                                        <div class="opcao" data-correta="false">Menor ruído elétrico.</div>
-                                        <div class="opcao" data-correta="false">Circuito mais simples.</div>
-                                    </div>
+                                    <div class="opcao" data-correta="false">Menor ruído elétrico.</div>
+                                    <div class="opcao" data-correta="false">Circuito mais simples.</div>
                                 </div>
                             </div>
-                        </div>
+                            </div>
+                            </div>
 
-                        <div id="s3e10" data-sa="s3" data-num="10" data-type="video" data-ytid="E738SS5QwhU">
-                            <h1 class="title">Fontes variáveis</h1>
-                            <span class="duration">18 min</span>
-                            <a class="video" href="https://example.com/sa3e10"></a>
-                            <p class="sinopse">Utilize o regulador LM317 para garantir controle e segurança na
-                                alimentação
-                                de circuitos em bancada.
+                    <div id="s3e10" data-sa="s3" data-num="10" data-type="video" data-ytid="E738SS5QwhU">
+                        <h1 class="title">Fontes variáveis</h1>
+                        <span class="duration">18 min</span>
+                        <a class="video" href="https://example.com/sa3e10"></a>
+                        <p class="sinopse">Utilize o regulador LM317 para garantir controle e segurança na
+                            alimentação
+                            de circuitos em bancada.
+                        </p>
+                        <div class="book-text">
+                            <p>Siga este guia e compreenda como interpreting o esquema elétrico de uma fonte
+                                variável,
+                                desde a entrada da rede até o
+                                ajuste final com o regulador LM317.</p>
+
+                            <p class="fw-bold mt-3">Fonte variável</p>
+                            <p>Para converter a rede elétrica em tensão contínua ajustável, seguimos este fluxo:</p>
+                            <ul class="mx-4">
+                                <li><strong>Transformação:</strong> o transformador reduz a alta tensão da rede via
+                                    indução;</li>
+                                <li><strong>Retificação:</strong> diodos convertem a corrente alternada \(AC\) em
+                                    contínua (DC);</li>
+                                <li><strong>Filtragem:</strong> capacitores eliminam o ripple (ondulações),
+                                    estabilizando o sinal.</li>
+                                <li><strong>Regulação (LM317):</strong> O regulador mantém a saída constante. O
+                                    ajuste
+                                    fino ocorre pelo cálculo de
+                                    divisor de tensão: alterando a resistência no pino de ajuste (ADJ), define-se a
+                                    voltagem final.</li>
+                            </ul>
+                            <p class="mt-3">No diagrama a seguir, entendemos como a eletricidade da rede se
+                                transforma
+                                em uma tensão contínua e
+                                ajustável para seus projetos.</p>
+
+                            <p class="mt-3">Ao seguir cada etapa da redução de tensão no transformador até o ajuste
+                                preciso no regulador LM317 você
+                                entenderá como garantir a segurança e a eficiência na alimentação dos seus
+                                circuitos.
                             </p>
-                            <div class="book-text">
-                                <p>Siga este guia e compreenda como interpreting o esquema elétrico de uma fonte
-                                    variável,
-                                    desde a entrada da rede até o
-                                    ajuste final com o regulador LM317.</p>
 
-                                <p class="fw-bold mt-3">Fonte variável</p>
-                                <p>Para converter a rede elétrica em tensão contínua ajustável, seguimos este fluxo:</p>
-                                <ul class="mx-4">
-                                    <li><strong>Transformação:</strong> o transformador reduz a alta tensão da rede via
-                                        indução;</li>
-                                    <li><strong>Retificação:</strong> diodos convertem a corrente alternada \(AC\) em
-                                        contínua (DC);</li>
-                                    <li><strong>Filtragem:</strong> capacitores eliminam o ripple (ondulações),
-                                        estabilizando o sinal.</li>
-                                    <li><strong>Regulação (LM317):</strong> O regulador mantém a saída constante. O
-                                        ajuste
-                                        fino ocorre pelo cálculo de
-                                        divisor de tensão: alterando a resistência no pino de ajuste (ADJ), define-se a
-                                        voltagem final.</li>
-                                </ul>
-                                <p class="mt-3">No diagrama a seguir, entendemos como a eletricidade da rede se
-                                    transforma
-                                    em uma tensão contínua e
-                                    ajustável para seus projetos.</p>
-
-                                <p class="mt-3">Ao seguir cada etapa da redução de tensão no transformador até o ajuste
-                                    preciso no regulador LM317 você
-                                    entenderá como garantir a segurança e a eficiência na alimentação dos seus
-                                    circuitos.
-                                </p>
-
-                                <p class="mt-3"><em>Fonte: Elaborada pelo autor com auxílio de IA (2026).</em></p>
+                            <p class="mt-3"><em>Fonte: Elaborada pelo autor com auxílio de IA (2026).</em></p>
                             </div>
                             <div class="formula">\( V_{out} = 1.25(1 + \frac{R_2}{R_1}) \)</div>
                             <div class="interactive-questions">
-                                <div class="interacao" data-tempo="200" data-titulo="Regulador Ajustável"
-                                    data-tipo="single" data-msg="Perfeito!">
-                                    <div class="pergunta">Qual componente é comumente usado como regulador de tensão
-                                        ajustável?</div>
-                                    <div class="opcoes">
-                                        <div class="opcao" data-correta="false">7805</div>
-                                        <div class="opcao" data-correta="true">LM317</div>
-                                        <div class="opcao" data-correta="false">1N4007</div>
-                                    </div>
+                            <div class="interacao" data-tempo="200" data-titulo="Regulador Ajustável" data-tipo="single" data-msg="Perfeito!">
+                                <div class="pergunta">Qual componente é comumente usado como regulador de tensão
+                                    ajustável?</div>
+                                <div class="opcoes">
+                                    <div class="opcao" data-correta="false">7805</div>
+                                    <div class="opcao" data-correta="true">LM317</div>
+                                    <div class="opcao" data-correta="false">1N4007</div>
                                 </div>
                             </div>
-                        </div>
+                            </div>
+                            </div>
+
             </section>
 
 
             <!-- Lista de Episódios -->
             <section class="episodes-section">
-                <div class="episodes-header">
+                <div class="episodes-header mx-2">
                     <h2>Episódios</h2>
-                    <select id="seasonSelector" onchange="changeSeason()">
+                    <select id="seasonSelector">
                         <option value="s1">Fundamentos da Eletrônica</option>
                         <option value="s2">Sinais Alternados e Transformadores</option>
                         <option value="s3">Semicondutores e Fontes de Alimentação</option>
                     </select>
                 </div>
-
                 <div id="episodesListContainer"></div>
             </section>
 
@@ -1567,6 +1554,81 @@
     </main>
 
     <script src="Layout/Template/bibliotecas/bootstrap/js/bootstrap.bundle.min.js" defer=""></script>
+    
+    <!-- Modal de Retomada -->
+    <div class="modal fade" id="resumeFromLastModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Retomar Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Deseja continuar de onde parou na última sessão?</p>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-secondary" id="resumeFromBeginning">Começar do
+                        início</button>
+                    <button type="button" class="btn btn-danger" id="resumeFromLastButton">Sim, retomar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Conclusão de Curso -->
+    <div class="modal fade" id="courseCompletionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-danger shadow-lg">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title fw-bold"><i class="bx bxs-trophy me-2 text-warning"></i> Curso Concluído!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <h2 class="display-4 fw-bold text-danger" id="completionGrade">0</h2>
+                        <p class="text-muted text-uppercase fw-bold">Sua Nota Final</p>
+                    </div>
+    
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3">
+                            <div class="card bg-secondary bg-opacity-25 border-0 text-center p-3">
+                                <h3 class="fw-bold mb-0" id="totalQuestionsCount">0</h3>
+                                <small class="text-muted">Questões</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card bg-success bg-opacity-25 border-0 text-center p-3">
+                                <h3 class="fw-bold mb-0 text-success" id="correctAnswersCount">0</h3>
+                                <small class="text-muted">Acertos</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card bg-danger bg-opacity-25 border-0 text-center p-3">
+                                <h3 class="fw-bold mb-0 text-danger" id="incorrectAnswersCount">0</h3>
+                                <small class="text-muted">Erros</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="card bg-warning bg-opacity-25 border-0 text-center p-3">
+                                <h3 class="fw-bold mb-0 text-warning" id="pendingAnswersCount">0</h3>
+                                <small class="text-muted">Pendentes</small>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <h6 class="fw-bold border-bottom border-secondary pb-2 mb-3">Relatório por Episódio</h6>
+                    <div id="completionDetailsReport" class="accordion accordion-flush bg-transparent">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-danger px-4 fw-bold" onclick="window.print()">Imprimir
+                        Relatório</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 

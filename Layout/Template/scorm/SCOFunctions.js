@@ -398,15 +398,84 @@ function getSuspendDataValue(key) {
 /**
  * Atualiza ou insere um valor em um objeto JSON no suspend_data sem perder os outros campos
  */
+let commitTimeout = null;
+function throttledCommit() {
+    if (commitTimeout) return;
+    
+    // FIX: Se estiver rodando localmente (Live Server), evitamos o commit constante
+    // que pode estar disparando o auto-reload do editor ao escrever em arquivos.
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+        console.log("[SCOFunctions] Commit ignorado em ambiente local para evitar auto-reload");
+        return;
+    }
+
+    commitTimeout = setTimeout(() => {
+        doLMSCommit();
+        commitTimeout = null;
+    }, 10000); // Garante no máximo 1 commit a cada 10 segundos
+}
+
+function updateLMSScore() {
+    try {
+        const raw = doLMSGetValue("cmi.suspend_data");
+        const suspendData = (raw && raw !== "" && raw !== "null") ? JSON.parse(raw) : {};
+        const allVideos = suspendData.videos || {};
+        
+        // 1. Contar total de perguntas em todo o curso (episodesData)
+        let totalQuestions = 0;
+        if (window.episodesData && window.episodesData.length > 0) {
+            window.episodesData.forEach(ep => {
+                totalQuestions += (ep.interacoes ? ep.interacoes.length : 0);
+            });
+        } else {
+            console.warn("[SCORM] episodesData está vazio ou não carregado.");
+        }
+        
+        if (totalQuestions === 0) {
+            console.warn("[SCORM] Total de perguntas é 0. Score não atualizado.");
+            return;
+        }
+
+        // 2. Contar respostas corretas salvas no suspend_data
+        let correctAnswers = 0;
+        Object.keys(allVideos).forEach(vidId => {
+            const video = allVideos[vidId];
+            if (video.interactions) {
+                video.interactions.forEach(inter => {
+                    if (inter.respondida && inter.resultado === true) {
+                        correctAnswers++;
+                    }
+                });
+            }
+        });
+
+        // 3. Calcular score (0 a 100)
+        const score = Math.round((correctAnswers / totalQuestions) * 100);
+        
+        console.log(`[SCORM] Progresso: ${correctAnswers} acertos de ${totalQuestions} perguntas totais.`);
+        console.log(`[SCORM] Enviando Score Raw: ${score}`);
+        
+        doLMSSetValue("cmi.core.score.raw", score.toString());
+        doLMSSetValue("cmi.core.score.min", "0");
+        doLMSSetValue("cmi.core.score.max", "100");
+        
+        throttledCommit();
+    } catch (e) {
+        console.warn("Erro ao atualizar score LMS:", e);
+    }
+}
+
 function setSuspendDataValue(key, value) {
     try {
-        const raw = doLMSGetValue("cmi.suspend_data") || "{}";
-        const data = JSON.parse(raw);
-        data[key] = value;
-        doLMSSetValue("cmi.suspend_data", JSON.stringify(data));
-        doLMSCommit();
+        const raw = doLMSGetValue("cmi.suspend_data");
+        const suspendData = (raw && raw !== "" && raw !== "null") ? JSON.parse(raw) : {};
+        suspendData[key] = value;
+        doLMSSetValue("cmi.suspend_data", JSON.stringify(suspendData));
+        
+        // Substitui o commit imediato pelo throttled
+        throttledCommit();
     } catch (e) {
-        console.error("Erro ao salvar no suspend_data:", e);
+        console.warn("Erro ao salvar suspend_data:", e);
     }
 }
 
@@ -467,20 +536,25 @@ const resumeFromBeginning = document.getElementById("resumeFromBeginning");
 if (resumeFromLastButton) {
     resumeFromLastButton.addEventListener("click", () => {
         try {
-            const suspendData = JSON.parse(doLMSGetValue("cmi.suspend_data"));
+            const raw = doLMSGetValue("cmi.suspend_data");
+            const suspendData = (raw && raw !== "" && raw !== "null") ? JSON.parse(raw) : {};
             const location = doLMSGetLessonLocation();
 
-            // Retorna para a última posição salva com base em scrollY
-    window.location.href = `${location}#${suspendData.scrollY}`;
-    bootstrap.Modal.getOrCreateInstance("#resumeFromLastModal").hide();
-  } catch {
-    // Caso não existam dados, resetar o suspend_data
-    doLMSSetValue("cmi.suspend_data", JSON.stringify({}));
-    doLMSCommit();
-
-    bootstrap.Modal.getOrCreateInstance("#resumeFromLastModal").hide();
-  }
-});
+            // 1. Se houver um vídeo pendente, abre o modal de vídeo
+            if (suspendData.lastVideoUrl && typeof openVideoPlayer === 'function') {
+                openVideoPlayer(suspendData.lastVideoUrl);
+            } 
+            // 2. Senão, restaura a posição de scroll se houver hash
+            else if (suspendData.scrollY) {
+                window.location.href = `${location}#${suspendData.scrollY}`;
+            }
+            
+            bootstrap.Modal.getOrCreateInstance("#resumeFromLastModal").hide();
+        } catch (e) {
+            console.warn("Erro ao retomar:", e);
+            bootstrap.Modal.getOrCreateInstance("#resumeFromLastModal").hide();
+        }
+    });
 }
 
 if (resumeFromBeginning) {
@@ -508,7 +582,8 @@ function debounce(func, delay) {
 window.addEventListener("DOMContentLoaded", () => {
   try {
     doLMSInitialize(); // Inicializa comunicação com Moodle
-    const suspendData = JSON.parse(doLMSGetValue("cmi.suspend_data"));
+    const rawSuspendData = doLMSGetValue("cmi.suspend_data");
+    const suspendData = (rawSuspendData && rawSuspendData !== "") ? JSON.parse(rawSuspendData) : null;
     const location = doLMSGetLessonLocation();
     const status = doLMSGetValue("cmi.core.lesson_status");
     const { hash, href } = window.location;
@@ -516,7 +591,10 @@ window.addEventListener("DOMContentLoaded", () => {
     if (status == "not attempted") doLMSSetValue("cmi.core.lesson_status", "incomplete");
 
     // Condição para mostrar modal de retomada quando necessário
-    if (hash === "" && href.includes(infosToCompleteScorm.firstPageHTML) && (suspendData || location)) {
+    const lastVideoUrl = suspendData?.lastVideoUrl || localStorage.getItem('lastVideoUrl');
+    const hasProgress = lastVideoUrl || suspendData?.scrollY || location;
+
+    if (hash === "" && href.includes(infosToCompleteScorm.firstPageHTML) && hasProgress) {
       bootstrap.Modal.getOrCreateInstance("#resumeFromLastModal").show();
     }
   } catch (error) {

@@ -27,12 +27,27 @@ function setSettingsAccessibilityStorage(object) {
 if (typeof getSuspendDataValue === 'function' && getSuspendDataValue('settingsAccessibility')) {
     settings = getSuspendDataValue('settingsAccessibility');
 } else if (localStorage.getItem('settingsAccessibility')) {
-    settings = JSON.parse(localStorage.getItem('settingsAccessibility'));
+    try {
+        settings = JSON.parse(localStorage.getItem('settingsAccessibility'));
+    } catch (e) {
+        console.error("Erro ao carregar settingsAccessibility:", e);
+        settings = { contrast: false, fontScale: 1 };
+    }
+}
+
+// Funções utilitárias
+function safeJSONParse(str, fallback) {
+    try {
+        return str ? JSON.parse(str) : fallback;
+    } catch (e) {
+        console.warn("Erro ao processar JSON:", e);
+        return fallback;
+    }
 }
 
 // Funções para marcar vídeos assistidos
 function markAsWatched(videoUrl) {
-    let watched = JSON.parse(localStorage.getItem('watchedVideos') || '[]');
+    let watched = safeJSONParse(localStorage.getItem('watchedVideos'), []);
     if (!watched.includes(videoUrl)) {
         watched.push(videoUrl);
         localStorage.setItem('watchedVideos', JSON.stringify(watched));
@@ -40,7 +55,7 @@ function markAsWatched(videoUrl) {
 }
 
 function isWatched(videoUrl) {
-    let watched = JSON.parse(localStorage.getItem('watchedVideos') || '[]');
+    let watched = safeJSONParse(localStorage.getItem('watchedVideos'), []);
     return watched.includes(videoUrl);
 }
 
@@ -675,7 +690,8 @@ function syncEpisodesFromHTML() {
     if (!epContainer) return;
 
     window.episodesData = [];
-    epContainer.querySelectorAll('[id]').forEach(epEl => {
+    // FIX: Apenas divs que são episódios reais (possuem data-sa)
+    epContainer.querySelectorAll('div[data-sa][id]').forEach(epEl => {
         // Busca interações a partir dos elementos HTML filhos
         const interactiveQuestions = epEl.querySelector('.interactive-questions');
         const parsedInteractions = [];
@@ -713,7 +729,7 @@ function syncEpisodesFromHTML() {
             special: epEl.getAttribute('data-special') || null,
             num: parseInt(epEl.getAttribute('data-num')) || 0,
             type: epEl.getAttribute('data-type') || 'video',
-            title: epEl.querySelector('.title')?.innerHTML || '',
+            title: epEl.querySelector('.title')?.innerText || '',
             duration: epEl.querySelector('.duration')?.innerHTML || '',
             video: epEl.querySelector('.video')?.getAttribute('href') || '',
             thumb: epEl.querySelector('.thumb')?.getAttribute('src') || '',
@@ -896,7 +912,7 @@ function changeSeason() {
 }
 
 // ARMAZENAMENTO DE THUMBS GERADAS
-window.generatedThumbs = JSON.parse(sessionStorage.getItem('senaiThumbs') || '{}');
+window.generatedThumbs = safeJSONParse(sessionStorage.getItem('senaiThumbs'), {});
 
 /**
  * Extrai o ID do YouTube de diversas variantes de URL
@@ -988,8 +1004,21 @@ function renderEpisodes() {
     const season = document.getElementById('seasonSelector').value;
     const container = document.getElementById('episodesListContainer');
     if (!container) return;
+
+    // Se o modal de vídeo estiver aberto, evitamos o re-render pesado da lista de fundo
+    const isModalOpen = document.getElementById('videoModal')?.style.display === 'flex';
     
+    // Se já renderizamos essa temporada recentemente e o modal está aberto, apenas atualiza classes CSS
+    if (isModalOpen && container.dataset.renderedSeason === season) {
+        container.querySelectorAll('.episode-row').forEach(row => {
+            const videoUrl = row.dataset.video;
+            if (isWatched(videoUrl)) row.classList.add('watched-row');
+        });
+        return;
+    }
+
     container.innerHTML = '';
+    container.dataset.renderedSeason = season;
 
     const filtered = episodesData.filter(ep => ep.sa === season);
 
@@ -1033,7 +1062,7 @@ function renderEpisodes() {
         `;
         container.appendChild(row);
 
-        if (!window.generatedThumbs[ep.id]) {
+        if (!window.generatedThumbs[ep.id] && !isModalOpen) {
             captureVideoFrame(ep.video, ep.id, ep.thumb).then(dataUrl => {
                 const thumbElem = document.getElementById(`thumb-${ep.id}`);
                 if (thumbElem) {
@@ -1044,13 +1073,27 @@ function renderEpisodes() {
             });
         }
     });
+
+    // Se for a última temporada, adiciona o botão de relatório final
+    if (season === 's3') {
+        const reportBtnContainer = document.createElement('div');
+        reportBtnContainer.className = 'report-completion-container mt-5 p-4 text-center border-top border-secondary bg-dark bg-opacity-25 rounded-3 shadow-sm';
+        reportBtnContainer.innerHTML = `
+            <h5 class="text-white mb-3 fw-bold"><i class="bx bxs-graduation me-2 text-danger"></i> Finalizou o conteúdo?</h5>
+            <p class="text-muted small mb-4">Veja seu desempenho completo, acertos e erros em todas as atividades do curso.</p>
+            <button class="btn btn-danger btn-lg px-5 fw-bold shadow-lg" onclick="showCourseCompletionReport()">
+                <i class="bx bxs-bar-chart-alt-2 me-2"></i> VER RELATÓRIO DE DESEMPENHO
+            </button>
+        `;
+        container.appendChild(reportBtnContainer);
+    }
 }
 
 // --- FUNÇÕES DE NAVEGAÇÃO DOS MODAIS ---
 /**
  * Abre o player de vídeo
  */
-function openVideoPlayer(url) {
+function openVideoPlayer(url, startTime = 0) {
     if (!url || url.includes("COLE_AQUI")) {
         alert("Conteúdo demonstrativo. Insira o link real no código.");
         return;
@@ -1065,10 +1108,8 @@ function openVideoPlayer(url) {
     }
 
     // Buscar dados do episódio para as interações
-    // Tenta 1: URL exata. Tenta 2: ytid no URL. Tenta 3: URL parcial.
     let currentEpisode = episodesData.find(ep => ep.video === url);
     if (!currentEpisode) {
-        // Tentar extraindo o ytid da URL e comparando
         const ytMatch = url.match(/v=([^&]+)/) || url.match(/youtu\.be\/([^?]+)/) || url.match(/embed\/([^?]+)/) || url.match(/watch\?v=([^&]+)/);
         if (ytMatch) {
             const ytid = ytMatch[1];
@@ -1076,26 +1117,28 @@ function openVideoPlayer(url) {
         }
     }
     if (!currentEpisode) {
-        // Correspondência parcial de URL
         currentEpisode = episodesData.find(ep => ep.video && url && (ep.video.includes(url) || url.includes(ep.video.split('/').pop())));
     }
     const interacoes = currentEpisode ? (currentEpisode.interacoes || []) : [];
-    console.log(`[openModalWithUrl] Episódio encontrado: ${currentEpisode?.id}, interações: ${interacoes.length}`);
 
-    // RESOLVER URL REAL (Mapeamento de Redirecionamento para Link Direto)
+    // RESOLVER URL REAL
     let finalUrl = url;
     if (currentEpisode && (typeof videos !== 'undefined')) {
         const mappedUrls = videos[currentEpisode.id] || videos[currentEpisode.num];
         if (mappedUrls) {
             const isLibras = localStorage.getItem('isLibrasVideoActive') === 'true';
             finalUrl = isLibras ? mappedUrls.comLibras : mappedUrls.semLibras;
-            console.log(`Mapeando vídeo ${currentEpisode.id}: ${url} -> ${finalUrl}`);
         }
     }
 
-    // Rastrear URL original para o progresso, mas usar finalUrl para o player
+    // Rastrear URL original para o progresso
     window.currentVideoUrl = url;
     saveProgress(url);
+    if (typeof setSuspendDataValue === 'function') {
+        setSuspendDataValue('lastVideoUrl', url);
+    } else {
+        localStorage.setItem('lastVideoUrl', url);
+    }
 
     // Abrir modal
     modal.style.display = 'flex';
@@ -1104,7 +1147,7 @@ function openVideoPlayer(url) {
 
     // Inicializar Player Interativo
     if (typeof VideoInterativoUniversal !== 'undefined') {
-        const videoOptions = getInteractivePlayerOptions(url, currentEpisode, finalUrl);
+        const videoOptions = getInteractivePlayerOptions(url, currentEpisode, finalUrl, startTime);
         window.interactivePlayerInstance = new VideoInterativoUniversal(videoOptions);
     } else {
         console.warn('Classe VideoInterativoUniversal não encontrada.');
@@ -1128,9 +1171,12 @@ function syncModalContent(url) {
     // Título e Sinopse
     document.getElementById('currentEpisodeSynopsis').innerHTML = `<h1>${currentEpisode.title}</h1>${currentEpisode.sinopse}<hr>${currentEpisode.bookText}`;
 
-    // Renderizar Fórmulas (MathJax)
+    // Renderizar Fórmulas (MathJax) - LIMITADO APENAS AO CONTEÚDO DO MODAL
     if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
-        window.MathJax.typesetPromise();
+        const synopsisEl = document.getElementById('currentEpisodeSynopsis');
+        if (synopsisEl) {
+            window.MathJax.typesetPromise([synopsisEl]);
+        }
     }
 
     // Playlist de Episódios
@@ -1193,7 +1239,6 @@ function parseDuration(durationStr) {
     return 0;
 }
 
-
 function changeVideo(url) {
     if (!url || url.includes("COLE_AQUI")) {
         alert("Conteúdo demonstrativo. Insira o link real no código.");
@@ -1239,21 +1284,30 @@ function changeVideo(url) {
  * Auxiliar para gerar as opções do Player Interativo Universal
  * Centraliza a lógica de mapeamento de YTID para garantir consistência
  */
-function getInteractivePlayerOptions(url, currentEpisode, resolvedUrl) {
+function getInteractivePlayerOptions(url, currentEpisode, resolvedUrl, startTime = 0) {
     const interacoes = currentEpisode ? (currentEpisode.interacoes || []) : [];
     
     const options = {
         containerId: 'interactiveVideoContainer',
         videoUrl: resolvedUrl || url,
         videoId: currentEpisode ? currentEpisode.id : url,
+        title: currentEpisode ? currentEpisode.title : 'Vídeo Interativo',
         autoplay: true,
-        interacoes: interacoes
+        interacoes: interacoes,
+        startTime: startTime
     };
 
     // Prioridade total ao YTID para garantir controles (API YouTube)
     if (currentEpisode && currentEpisode.ytid) {
         options.videoUrl = `https://www.youtube.com/watch?v=${currentEpisode.ytid}`;
     }
+
+    options.onCourseEnded = () => {
+        console.log("[Main] Curso finalizado. Exibindo relatório...");
+        if (typeof showCourseCompletionReport === 'function') {
+            showCourseCompletionReport();
+        }
+    };
 
     return options;
 }
@@ -1290,6 +1344,8 @@ function toggleFullscreen() {
 }
 
 function closeVideoPlayer() {
+    console.log("[main.js] closeVideoPlayer chamado");
+    console.trace();
     const modal = document.getElementById('videoModal');
 
     if (window.interactivePlayerInstance) {
@@ -1423,6 +1479,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateHeroButton();
     changeSeason(); // Adicionado para carregar o vídeo da capa no início
+    console.log("[main.js] DOMContentLoaded - Sessão iniciada em:", new Date().toLocaleTimeString());
+    const lastUnload = localStorage.getItem('lastUnloadReason');
+    if (lastUnload) {
+        console.warn("[main.js] A página recarregou anteriormente. Razão:", lastUnload);
+        localStorage.removeItem('lastUnloadReason');
+    }
+
+    window.addEventListener('beforeunload', () => {
+        localStorage.setItem('lastUnloadReason', `Unload em ${new Date().toLocaleTimeString()}. Modal aberto: ${document.getElementById('videoModal')?.style.display === 'flex'}`);
+    });
+
+    // Sincroniza Season Selector com SCORM
+    const selector = document.getElementById('seasonSelector');
+    if (selector) {
+        // Restaurar temporada
+        const lastSeason = typeof getSuspendDataValue === 'function' ? getSuspendDataValue('lastSeason') : localStorage.getItem('lastSeason');
+        if (lastSeason) selector.value = lastSeason;
+
+        selector.addEventListener('change', () => {
+            if (typeof setSuspendDataValue === 'function') {
+                setSuspendDataValue('lastSeason', selector.value);
+            } else {
+                localStorage.setItem('lastSeason', selector.value);
+            }
+            changeSeason();
+        });
+    }
 });
 
 // Event listener UNIFICADO para fechar modais com ESC
@@ -1441,3 +1524,123 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
+/**
+ * Gera e exibe o relatório final de conclusão de curso
+ */
+function showCourseCompletionReport() {
+    try {
+        const raw = (typeof doLMSGetValue === 'function') ? doLMSGetValue("cmi.suspend_data") : localStorage.getItem('lastVideoUrl');
+        const suspendData = (raw && raw !== "" && raw !== "null") ? JSON.parse(raw) : {};
+        const allVideosProgress = suspendData.videos || {};
+        
+        let totalQ = 0;
+        let correctQ = 0;
+        let incorrectQ = 0;
+        let pendingQ = 0;
+        let reportHtml = '';
+
+        if (!window.episodesData || window.episodesData.length === 0) {
+            console.warn("[Completion] window.episodesData não está disponível.");
+            return;
+        }
+
+        window.episodesData.forEach((ep, epIndex) => {
+            const videoId = ep.id;
+            const videoProgress = allVideosProgress[videoId] || { interactions: [] };
+            const epInteractions = ep.interacoes || [];
+            
+            if (epInteractions.length === 0) return;
+
+            let epCorrect = 0;
+            let epIncorrect = 0;
+            let epPending = 0;
+            let epQuestionsHtml = '';
+
+            epInteractions.forEach((inter, iIndex) => {
+                totalQ++;
+                // Procurar no progresso salvo
+                const savedInter = videoProgress.interactions ? videoProgress.interactions.find(si => si.tempo === inter.tempo) : null;
+                
+                if (!savedInter || !savedInter.respondida) {
+                    epPending++;
+                    pendingQ++;
+                    epQuestionsHtml += `<li class="list-group-item bg-transparent text-white py-1 border-0 list-group-item-action" style="cursor:pointer" onclick="goToQuestion('${ep.video}', ${inter.tempo})"><i class="bx bx-play-circle me-2 text-warning"></i> Questão aos ${inter.tempo}s: <span class="badge bg-secondary">Pendente</span> <small class="ms-2 text-muted">(Clique para ir)</small></li>`;
+                } else if (savedInter.resultado === true) {
+                    epCorrect++;
+                    correctQ++;
+                    epQuestionsHtml += `<li class="list-group-item bg-transparent text-white py-1 border-0"><i class="bx bx-check text-success me-2"></i> Questão aos ${inter.tempo}s: <span class="badge bg-success">Correta</span></li>`;
+                } else {
+                    epIncorrect++;
+                    incorrectQ++;
+                    epQuestionsHtml += `<li class="list-group-item bg-transparent text-white py-1 border-0"><i class="bx bx-x text-danger me-2"></i> Questão aos ${inter.tempo}s: <span class="badge bg-danger">Incorreta</span></li>`;
+                }
+            });
+
+            const epStatusIcon = epPending === 0 ? (epIncorrect === 0 ? 'bxs-check-circle text-success' : 'bxs-info-circle text-warning') : 'bx-circle text-muted';
+
+            reportHtml += `
+                <div class="accordion-item bg-transparent border-secondary">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-transparent text-white shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#epReport${epIndex}">
+                            <i class="bx ${epStatusIcon} me-2 fs-5"></i>
+                            <div class="flex-grow-1">
+                                <div class="small text-muted text-uppercase" style="font-size: 0.65rem;">${ep.sa.toUpperCase()} - EP ${ep.num}</div>
+                                <div class="fw-bold">${ep.title}</div>
+                            </div>
+                            <span class="badge bg-secondary ms-2">${epCorrect}/${epInteractions.length}</span>
+                        </button>
+                    </h2>
+                    <div id="epReport${epIndex}" class="accordion-collapse collapse" data-bs-parent="#completionDetailsReport">
+                        <div class="accordion-body py-2">
+                            <ul class="list-group list-group-flush">
+                                ${epQuestionsHtml}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Atualizar contadores no Modal
+        const finalGrade = totalQ > 0 ? Math.round((correctQ / totalQ) * 100) : 0;
+        document.getElementById('completionGrade').innerText = finalGrade;
+        document.getElementById('totalQuestionsCount').innerText = totalQ;
+        document.getElementById('correctAnswersCount').innerText = correctQ;
+        document.getElementById('incorrectAnswersCount').innerText = incorrectQ;
+        document.getElementById('pendingAnswersCount').innerText = pendingQ;
+        document.getElementById('completionDetailsReport').innerHTML = reportHtml;
+
+        // Mostrar o Modal
+        const modalEl = document.getElementById('courseCompletionModal');
+        if (modalEl) {
+            const completionModal = new bootstrap.Modal(modalEl);
+            completionModal.show();
+        }
+
+        // Enviar status de conclusão ao SCORM se necessário
+        if (typeof doLMSSetValue === 'function') {
+            doLMSSetValue("cmi.core.lesson_status", "completed");
+            if (typeof throttledCommit === 'function') throttledCommit();
+        }
+
+    } catch (e) {
+        console.error("Erro ao gerar relatório de conclusão:", e);
+    }
+}
+
+/**
+ * Fecha o relatório de conclusão e leva o usuário diretamente para uma questão específica
+ */
+function goToQuestion(videoUrl, timestamp) {
+    console.log(`[GoToQuestion] Direcionando para ${videoUrl} aos ${timestamp}s`);
+    
+    // 1. Fechar o modal de conclusão
+    const modalEl = document.getElementById('courseCompletionModal');
+    if (modalEl) {
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+    }
+
+    // 2. Abrir o vídeo no tempo especificado
+    openVideoPlayer(videoUrl, timestamp);
+}
