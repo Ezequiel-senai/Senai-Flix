@@ -172,7 +172,7 @@
                     </p>
 
                     <!-- Botão Fullscreen Relocado -->
-                    <div class="mt-4">
+                    <div class="mt-4 d-none d-lg-block" style="margin-right: 15px;">
                         <button class="btn btn-outline border rounded d-flex align-items-center gap-2"
                             onclick="toggleFullscreen()">
                             <i class="bx bx-fullscreen fs-4 text-white"></i>
@@ -1431,8 +1431,8 @@
             <!-- Modais do Player Netflix -->
             <!-- Modal do Player Redesenhado -->
             <div id="videoModal">
+                <button class="btn-close-video" onclick="closeVideoPlayer()" title="Fechar">&#x2715;</button>
                 <div class="video-modal-content">
-                    <button class="close-btn text-white" onclick="closeVideoPlayer()" title="Fechar">×</button>
                     <!-- Player Interativo -->
                     <div id="interactiveVideoContainer" style="width: 100%; aspect-ratio: 16/9; background: #000;">
                     </div>
@@ -1458,12 +1458,12 @@
                             </ul>
 
                             <!-- Botão Próximo Episódio Relocado -->
-                            <div id="nextEpisodeBtnContainer" style="display: none;">
+                            <!-- <div id="nextEpisodeBtnContainer" style="display: none;">
                                 <button id="nextEpisodeBtn" class="btn btn-sm btn-outline-danger"
                                     onclick="playNextEpisode()">
                                     Próximo Episódio <i class="bx bx-skip-next-circle"></i>
                                 </button>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="tab-content player-tab-content p-4" id="playerTabContent">
@@ -1510,10 +1510,9 @@
             <div id="conceptModal"
                 class="vw-100 vh-100 position-fixed top-0 start-0 d-none justify-content-center align-items-center opacity-0"
                 style="background-color: rgba(0,0,0,0.95); z-index: 99995; transition: opacity 0.3s ease;">
+                <button onclick="closeConcept()" class="btn-close-video" title="Fechar">&#x2715;</button>
                 <div class="bg-light text-dark rounded-3 overflow-hidden d-flex flex-column position-relative shadow-lg"
                     style="width: 90%; max-width: 900px; height: 85vh; font-family: 'Georgia', serif;">
-                    <button onclick="closeConcept()"
-                        class="btn btn-link text-secondary p-0 fs-1 lh-1 position-absolute top-0 end-0 mt-2 me-4 z-3">×</button>
 
                     <div class="flex-grow-1 p-4 p-md-5 overflow-auto">
                         <div class="small text-uppercase ls-lg text-secondary mb-1 fw-bold"

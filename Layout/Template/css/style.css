@@ -3146,7 +3146,7 @@ Simulador teste
   right: 0;
   width: 100%;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 60%, transparent 100%);
-  padding: 40px 15px 15px 15px;
+  padding: 40px 15px calc(15px + env(safe-area-inset-bottom, 0px)) 15px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -3574,7 +3574,7 @@ Simulador teste
   }
 
   .volume-slider {
-    width: 60px;
+    width: 100px;
   }
 
   .controls-row {
@@ -3586,8 +3586,49 @@ Simulador teste
   }
 
   .chapter-pill {
-    padding: 6px 10px;
-    font-size: 0.75rem;
+    padding: 10px 14px;
+      font-size: 0.85rem;
+    }
+    
+    /* Aumentar área de toque para botões no mobile */
+    .icon-btn,
+    .btn-mute,
+    .btn-fullscreen {
+      padding: 8px !important;
+      min-width: 44px;
+      min-height: 44px;
+    }
+    
+    .volume-slider {
+    width: 120px !important; /* Slider mais largo para facilitar o toque */
+  }
+
+  /* Ocultar controle de volume no mobile (restrição de hardware/LMS) */
+  .volume-container {
+    display: none !important;
+  }
+
+  .marker-tooltip {
+    display: none !important;
+  }
+    
+    /* Ajustes Landscape */
+    .interactive-overlay .js-exercise>div {
+      margin-top: 2vh !important;
+      max-height: 90vh !important;
+      padding-top: 30px !important;
+      padding-bottom: 20px !important;
+    }
+    
+    .interactive-overlay h4 {
+      font-size: 1.2rem !important;
+      margin-bottom: 10px !important;
+    }
+    
+    .interactive-overlay .list-group-item {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      font-size: 0.9rem !important;
   }
 }
 
@@ -3609,6 +3650,88 @@ Simulador teste
   height: 100%;
 }
 
+/* FULLSCREEN MOBILE - Fallback CSS para iOS Safari */
+.video-wrapper.mobile-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+  z-index: 99998 !important;
+  margin: 0 !important;
+}
+
+.video-wrapper.mobile-fullscreen .overlay-layer {
+  z-index: 2147483647;
+}
+
+/* Bloquear scroll do body (fullscreen mobile + modal) */
+body.body-no-scroll,
+html.body-no-scroll {
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+/* BASE PARA BOTÕES DE FECHAR */
+.btn-close-video,
+.btn-close-question {
+  position: fixed;
+  top: 30px !important;
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  min-height: 50px !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  font-size: 1.6rem !important;
+  line-height: 1;
+  color: #fff !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.btn-close-video:hover,
+.btn-close-question:hover {
+  background: #e30613 !important;
+  color: #fff !important;
+  transform: scale(1.1);
+}
+
+/* Ajustes Individuais de Alinhamento e Camadas (z-index) - DESKTOP */
+.btn-close-video {
+  right: 20px !important;
+  top: 20px !important;
+  z-index: 10100 !important;
+}
+
+.btn-close-question {
+  right: 14px !important;
+  top: 13px !important;
+  z-index: 10100 !important;
+}
+
+/* Ajustes Específicos para Mobile */
+@media (max-width: 768px) {
+  .btn-close-video {
+    right: 11px !important;
+    top: 33px !important;
+  }
+
+  .btn-close-question {
+    right: -4px !important;
+    top: 31px !important;
+  }
+}
 
 /* Ajuste de Texto do Modal de Vídeo (Sinopse e Playlist) - Versão Final */
 #currentEpisodeSynopsis,
@@ -4369,4 +4492,10 @@ mjx-container[jax="CHTML"] {
 /* Ajuste fino para o alinhamento do traço */
 mjx-frac {
   margin: 0 0.1em !important;
+}
+/* REMOVER TOOLTIP DE MARCADORES NO MOBILE */
+@media (max-width: 768px) {
+  .marker-tooltip {
+    display: none !important;
+  }
 }

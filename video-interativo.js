@@ -61,20 +61,29 @@ class VideoInterativoUniversal {
                     </div>
 
                     <div class="controls-row">
-                        <button class="icon-btn" id="btnPlayPause">
+                        <button class="icon-btn" id="btnPlayPause" title="Play/Pause">
                             <span class="material-icons text-white">play_arrow</span>
                         </button>
-                        
+                        <button class="icon-btn" id="btnReplay" title="Recomeçar">
+                            <span class="material-icons text-white">replay</span>
+                        </button>
+
                         <div class="volume-container">
-                            <button class="icon-btn" id="btnMute">
+                            <button class="icon-btn" id="btnVolDown" title="Volume -">
+                                <span class="material-icons text-white">remove</span>
+                            </button>
+                            <button class="icon-btn" id="btnMute" title="Mudo/Som">
                                 <span class="material-icons text-white">volume_up</span>
                             </button>
                             <input type="range" min="0" max="1" step="0.05" value="1" 
                                    class="volume-slider" id="volumeSlider">
+                            <button class="icon-btn" id="btnVolUp" title="Volume +">
+                                <span class="material-icons text-white">add</span>
+                            </button>
                         </div>
 
                         <span class="time-text" id="timeDisplay">00:00 / 00:00</span>
-                        <button class="icon-btn" id="btnFullscreen">
+                        <button class="icon-btn" id="btnFullscreen" title="Tela Cheia">
                             <span class="material-icons text-white">fullscreen</span>
                         </button>
                     </div>
@@ -246,21 +255,25 @@ class VideoInterativoUniversal {
                 showinfo: 0,
                 ecver: 2,
                 disablekb: 1,
-                iv_load_policy: 3
+                iv_load_policy: 3,
+                origin: window.location.origin,
+                widget_referrer: window.location.href
             },
             events: {
-                'onReady': () => {
-                    this.onYouTubeReady();
+                'onReady': (event) => {
+                    this.onYouTubeReady(event);
                 },
-                'onStateChange': (event) => this.onYouTubeStateChange(event)
+                'onStateChange': (event) => this.onYouTubeStateChange(event),
+                'onError': (event) => console.error('[VideoInterativo] Erro no Player YT:', event.data)
             }
         });
 
         // setupEvents será chamado pelo initialize e cuidará da sincronização
     }
 
-    onYouTubeReady() {
+    onYouTubeReady(event) {
         console.log('YouTube player pronto');
+        this._isYtReady = true;
         this.setupTimeline();
         
         // Tentativa de restaurar progresso assim que o player estiver pronto
@@ -294,6 +307,10 @@ class VideoInterativoUniversal {
             }
         } else if (event.data === window.YT.PlayerState.ENDED) {
             console.log('[VideoInterativo] Vídeo YouTube finalizado.');
+            // Mudar ícone do botão Play para Replay
+            const btnPlay = document.getElementById('btnPlayPause');
+            if (btnPlay) btnPlay.innerHTML = '<span class="material-icons">replay</span>';
+            this.wrapper.classList.add('paused');
             this.handleVideoEnded();
         }
         this.updateTime();
@@ -506,12 +523,25 @@ class VideoInterativoUniversal {
 
         let lastVolume = 1;
 
-        // Play/Pause
+        // Play/Pause (ou Reiniciar se o vídeo terminou)
         const togglePlay = () => {
             if (this.isLocked || this.isDestroyed) return;
 
             if (this.isIframeMode) {
                 console.warn('Controle de Play/Pause não disponível em modo Iframe Fallback.');
+                return;
+            }
+
+            // Se o ícone atual é "replay" (vídeo terminou), reiniciar
+            const playIcon = btnPlay ? btnPlay.querySelector('.material-icons') : null;
+            if (playIcon && playIcon.textContent === 'replay') {
+                if (this.youtubePlayer) {
+                    this.youtubePlayer.seekTo(0);
+                    this.youtubePlayer.playVideo();
+                } else if (this.video) {
+                    this.video.currentTime = 0;
+                    this.video.play().catch(err => console.warn('Replay bloqueado:', err));
+                }
                 return;
             }
 
@@ -535,13 +565,23 @@ class VideoInterativoUniversal {
             this.video.addEventListener('play', () => {
                 this.wrapper.classList.remove('paused');
                 btnPlay.innerHTML = '<span class="material-icons">pause</span>';
-                bigIcon.innerText = 'pause_circle_filled';
+                if (bigIcon) bigIcon.innerText = 'pause_circle_filled';
             });
 
             this.video.addEventListener('pause', () => {
+                // Apenas muda para play_arrow se não for o estado de fim de vídeo
+                if (!this.video.ended) {
+                    this.wrapper.classList.add('paused');
+                    btnPlay.innerHTML = '<span class="material-icons">play_arrow</span>';
+                    if (bigIcon) bigIcon.innerText = 'play_circle_filled';
+                }
+            });
+
+            // Quando o vídeo HTML5 termina: ícone vira replay
+            this.video.addEventListener('ended', () => {
                 this.wrapper.classList.add('paused');
-                btnPlay.innerHTML = '<span class="material-icons">play_arrow</span>';
-                bigIcon.innerText = 'play_circle_filled';
+                btnPlay.innerHTML = '<span class="material-icons">replay</span>';
+                if (bigIcon) bigIcon.innerText = 'replay';
             });
 
             this.video.addEventListener('click', (e) => {
@@ -550,7 +590,7 @@ class VideoInterativoUniversal {
                 }
             });
 
-            bigIcon.addEventListener('click', togglePlay);
+            if (bigIcon) bigIcon.addEventListener('click', togglePlay);
         }
 
         btnPlay.addEventListener('click', (e) => {
@@ -559,17 +599,68 @@ class VideoInterativoUniversal {
         });
 
         // Volume
-        volumeSlider.addEventListener('input', (e) => {
-            const vol = parseFloat(e.target.value);
+        const handleVolumeChange = (vol) => {
+            if (vol < 0) vol = 0;
+            if (vol > 1) vol = 1;
+            
+            const volPercent = Math.round(vol * 100);
+            console.log(`[VideoInterativo] Volume: ${volPercent}%`);
+
             if (!this.youtubePlayer) {
-                this.video.volume = vol;
-                this.video.muted = (vol === 0);
-            } else {
-                this.youtubePlayer.setVolume(vol * 100);
+                if (this.video) {
+                    this.video.volume = vol;
+                    this.video.muted = (vol === 0);
+                    
+                    // AudioContext Hack para iOS
+                    if ((window.AudioContext || window.webkitAudioContext)) {
+                        if (!this.audioCtx) {
+                            try {
+                                this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                                this.gainNode = this.audioCtx.createGain();
+                                const source = this.audioCtx.createMediaElementSource(this.video);
+                                source.connect(this.gainNode);
+                                this.gainNode.connect(this.audioCtx.destination);
+                            } catch (e) { console.warn('AudioContext bypass:', e); }
+                        }
+                        if (this.audioCtx && this.audioCtx.state === 'suspended') this.audioCtx.resume();
+                        if (this.gainNode) this.gainNode.gain.setTargetAtTime(vol, this.audioCtx.currentTime, 0.02);
+                    }
+                }
+            } else if (this._isYtReady) {
+                try {
+                    this.youtubePlayer.setVolume(volPercent);
+                    if (volPercent === 0) this.youtubePlayer.mute();
+                    else {
+                        this.youtubePlayer.unMute();
+                        // Reforço para garantir que o comando foi aceito
+                        setTimeout(() => {
+                            if (this.youtubePlayer && typeof this.youtubePlayer.setVolume === 'function') {
+                                this.youtubePlayer.setVolume(volPercent);
+                            }
+                        }, 50);
+                    }
+                } catch (e) { console.warn('Erro YT Volume:', e); }
             }
+            
+            volumeSlider.value = vol;
             this.updateVolumeIcon(vol);
             this.updateSliderFill(vol);
-        });
+        };
+
+        const handleVolumeTouch = (e) => {
+            e.stopPropagation();
+            if (e.cancelable) e.preventDefault();
+            const touch = e.touches[0];
+            const rect = volumeSlider.getBoundingClientRect();
+            const val = (touch.clientX - rect.left) / rect.width;
+            const clamped = Math.max(0, Math.min(1, val));
+            handleVolumeChange(clamped);
+        };
+
+        volumeSlider.addEventListener('input', (e) => handleVolumeChange(parseFloat(e.target.value)));
+        volumeSlider.addEventListener('change', (e) => handleVolumeChange(parseFloat(e.target.value)));
+        volumeSlider.addEventListener('touchstart', handleVolumeTouch, { passive: false });
+        volumeSlider.addEventListener('touchmove', handleVolumeTouch, { passive: false });
 
         btnMute.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -578,41 +669,76 @@ class VideoInterativoUniversal {
                 this.video.volume;
 
             if (currentVol === 0 || (this.video && this.video.muted)) {
-                if (this.youtubePlayer) {
-                    this.youtubePlayer.setVolume(lastVolume * 100);
-                } else {
-                    this.video.muted = false;
-                    this.video.volume = lastVolume || 1;
-                }
+                handleVolumeChange(lastVolume || 1);
+                if (this.video) this.video.muted = false;
             } else {
                 lastVolume = currentVol;
-                if (this.youtubePlayer) {
-                    this.youtubePlayer.setVolume(0);
-                } else {
-                    this.video.muted = true;
-                    this.video.volume = 0;
-                }
+                handleVolumeChange(0);
+                if (this.video) this.video.muted = true;
             }
-
-            volumeSlider.value = this.youtubePlayer ? 
-                this.youtubePlayer.getVolume() / 100 : 
-                this.video.volume;
-            this.updateVolumeIcon(volumeSlider.value);
-            this.updateSliderFill(volumeSlider.value);
         });
 
-        // Fullscreen
+        // Suporte a toque para botões de volume (mais rápido no mobile)
+        const addTouchSupport = (btn, action) => {
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                action();
+            }, { passive: false });
+        };
+
+
+        // Fullscreen (mobile-friendly com fallback CSS)
         btnFullscreen.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (!document.fullscreenElement) {
-                this.wrapper.requestFullscreen().catch(err => {
-                    console.error(`Erro ao entrar fullscreen: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
+            this.toggleFullscreen();
         });
 
+
+        // Recomeçar
+        const btnReplay = document.getElementById('btnReplay');
+        if (btnReplay) {
+            btnReplay.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.isDestroyed) return;
+                if (this.youtubePlayer) {
+                    this.youtubePlayer.seekTo(0);
+                    this.youtubePlayer.playVideo();
+                } else if (this.video) {
+                    this.video.currentTime = 0;
+                    this.video.play().catch(err => console.warn('Replay bloqueado:', err));
+                }
+            });
+        }
+
+        // Volume -
+        const btnVolDown = document.getElementById('btnVolDown');
+        const doVolDown = () => {
+            const currentVol = this.youtubePlayer
+                ? this.youtubePlayer.getVolume() / 100
+                : (this.video ? this.video.volume : 1);
+            handleVolumeChange(Math.max(0, Math.round((currentVol - 0.1) * 10) / 10));
+        };
+        if (btnVolDown) {
+            btnVolDown.addEventListener('click', (e) => { e.stopPropagation(); doVolDown(); });
+            addTouchSupport(btnVolDown, doVolDown);
+        }
+
+        // Volume +
+        const btnVolUp = document.getElementById('btnVolUp');
+        const doVolUp = () => {
+            const currentVol = this.youtubePlayer
+                ? this.youtubePlayer.getVolume() / 100
+                : (this.video ? this.video.volume : 1);
+            handleVolumeChange(Math.min(1, Math.round((currentVol + 0.1) * 10) / 10));
+        };
+        if (btnVolUp) {
+            btnVolUp.addEventListener('click', (e) => { e.stopPropagation(); doVolUp(); });
+            addTouchSupport(btnVolUp, doVolUp);
+        }
+
+        // Aplicar toque também ao Play e Mute
+        addTouchSupport(btnPlay, () => togglePlay());
+        addTouchSupport(btnMute, () => btnMute.click());
 
         // Keyboard Controls
         this.setupKeyboardControls(togglePlay);
@@ -647,6 +773,64 @@ class VideoInterativoUniversal {
             }
         };
         window.addEventListener('keydown', this._keyHandler);
+    }
+
+    toggleFullscreen() {
+        const el = this.wrapper;
+        const isInNativeFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        const isInCSSFS = el.classList.contains('mobile-fullscreen');
+        const btnFs = document.getElementById('btnFullscreen');
+
+        // Sair do fullscreen nativo
+        if (isInNativeFS) {
+            const exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (exitFS) exitFS.call(document);
+            return;
+        }
+
+        // Sair do fullscreen CSS (fallback mobile)
+        if (isInCSSFS) {
+            el.classList.remove('mobile-fullscreen');
+            document.body.classList.remove('body-no-scroll');
+            document.documentElement.classList.remove('body-no-scroll');
+            if (btnFs) btnFs.querySelector('.material-icons').textContent = 'fullscreen';
+            return;
+        }
+
+        // Listener para atualizar ícone ao mudar fullscreen nativo
+        const fsChangeHandler = () => {
+            const inFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            if (btnFs) btnFs.querySelector('.material-icons').textContent = inFS ? 'fullscreen_exit' : 'fullscreen';
+            if (!inFS) {
+                document.removeEventListener('fullscreenchange', fsChangeHandler);
+                document.removeEventListener('webkitfullscreenchange', fsChangeHandler);
+            }
+        };
+        document.addEventListener('fullscreenchange', fsChangeHandler);
+        document.addEventListener('webkitfullscreenchange', fsChangeHandler);
+
+        // Tentar API nativa (com prefixos para máxima compatibilidade)
+        const requestFS = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+        if (requestFS) {
+            const p = requestFS.call(el);
+            if (p && typeof p.then === 'function') {
+                p.then(() => {
+                    if (btnFs) btnFs.querySelector('.material-icons').textContent = 'fullscreen_exit';
+                }).catch(() => {
+                    // iOS Safari não suporta API → fallback CSS
+                    el.classList.add('mobile-fullscreen');
+                    document.body.classList.add('body-no-scroll');
+                    document.documentElement.classList.add('body-no-scroll');
+                    if (btnFs) btnFs.querySelector('.material-icons').textContent = 'fullscreen_exit';
+                });
+            }
+        } else {
+            // Sem suporte nenhum → fallback CSS
+            el.classList.add('mobile-fullscreen');
+            document.body.classList.add('body-no-scroll');
+            document.documentElement.classList.add('body-no-scroll');
+            if (btnFs) btnFs.querySelector('.material-icons').textContent = 'fullscreen_exit';
+        }
     }
 
     seekRelative(seconds) {
@@ -906,8 +1090,8 @@ class VideoInterativoUniversal {
         if (this.lastTriggeredTime === currentTime) return;
 
         // Exibe ao passar pelo tempo normalmente na reprodução contínua (se não finalizada). 
-        // Interações já finalizadas aparecem quando requisitadas via clique (jumpTo).
-        const index = this.config.interacoes.findIndex(i => i.tempo === currentTime && !i.respondida);
+        // Interações já finalizadas OU puladas aparecem apenas quando requisitadas via clique (jumpTo).
+        const index = this.config.interacoes.findIndex(i => i.tempo === currentTime && !i.respondida && !i.skipped);
         
         if (index !== -1) {
             const acao = this.config.interacoes[index];
@@ -976,12 +1160,17 @@ class VideoInterativoUniversal {
         const feedbackDisplay = jaRespondida ? 'block' : 'none';
         const successDisplay = (jaRespondida && interaction.resultado) ? 'block' : 'none';
         const errorDisplay = (jaRespondida && !interaction.resultado) ? 'block' : 'none';
-        const feedbackMsg = interaction.feedbackDada || '';
+        const feedbackMsg = interaction.resultado
+            ? 'Parabéns, você acertou! 🎉'
+            : 'Ops, você errou. Reveja o conteúdo!';
 
-        // Injetar o HTML baseado no js-exercise
+        // Injetar o HTML do modal interativo
         interactiveOverlay.innerHTML = `
             <div class="row py-3 js-exercise w-100 h-100 d-flex align-items-center justify-content-center" data-type="single" style="margin: 0; padding: 20px; position: absolute; top:0; left:0; z-index: 1000;">
-                <div class="col-lg-8 mx-auto py-5 border rounded" style="background-color: var(--bg-primary, #ffffff); box-shadow: 0 10px 40px rgba(0,0,0,0.5); border-radius: 12px; margin-top: 5vh; max-height: 80vh; overflow-y: auto;">
+                <!-- Botão X para fechar - Movido para fora do box que rola -->
+                <button id="btnCloseModal" class="btn-close-question" title="Fechar">&#x2715;</button>
+                
+                <div class="col-lg-8 mx-auto py-5 border rounded modal-interaction-box" style="position: relative; background-color: var(--bg-primary, #ffffff); box-shadow: 0 10px 40px rgba(0,0,0,0.5); border-radius: 12px; margin-top: 5vh; max-height: 85vh; overflow-y: auto;">
                     <div class="m-3 text-center">
                         <div class="text-danger small fw-bold text-uppercase mb-1" style="letter-spacing: 1px;">${this.config.title}</div>
                         <h4 style="color:#222; font-weight:700; margin-bottom: 20px; font-size: 1.5rem;">${dados.pergunta || 'Responda a questão para continuar'}</h4>
@@ -994,30 +1183,39 @@ class VideoInterativoUniversal {
                         <div class="feedback-correto" id="feedbackSuccess" style="display:${successDisplay};">
                             <div class="alert alert-success d-flex align-items-center p-3" style="font-size: 1.1rem;">
                                 <i class="bx bxs-check-circle me-3 fs-3"></i>
-                                <div class="msg-content fw-bold h5 mb-0" id="msgSuccessText">${interaction.resultado ? feedbackMsg : ''}</div>
+                                <div class="msg-content fw-bold h5 mb-0" id="msgSuccessText">${interaction.resultado ? 'Parabéns, você acertou! 🎉' : ''}</div>
                             </div>
                         </div>
                         <!-- Feedback Erro -->
                         <div class="feedback-erro" id="feedbackError" style="display:${errorDisplay};">
                             <div class="alert alert-danger d-flex align-items-center p-3" style="font-size: 1.1rem;">
                                 <i class="bx bxs-x-circle me-3 fs-3"></i>
-                                <div class="msg-texto fw-bold h5 mb-0" id="msgErrorText">${!interaction.resultado ? feedbackMsg : ''}</div>
+                                <div class="msg-texto fw-bold h5 mb-0" id="msgErrorText">${(!interaction.resultado && jaRespondida) ? 'Ops, você errou. Reveja o conteúdo!' : ''}</div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="mt-4 d-flex flex-column flex-sm-row justify-content-center gap-3 px-3">
+                    <div class="mt-4 d-flex flex-column flex-sm-row justify-content-center gap-3 mb-3">
                         ${!jaRespondida ? `<button id="btnConfirmQuestion" class="btn btn-primary text-black btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:none; max-width: 300px; margin: 0 auto;">Confirmar</button>` : ''}
-                        <button id="btnContinueVideo" class="btn ${jaRespondida ? 'btn-success' : 'btn-outline-primary'} btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.2rem; display:inline-block; max-width: 300px; margin: 0 auto;">
-                            ${jaRespondida ? 'Continuar Vídeo' : 'Continuar sem responder'} <i class="bx bx-play-circle ms-2"></i>
+                        <button id="btnContinueVideo" class="btn ${jaRespondida ? 'btn-success' : 'btn-outline-secondary'} btn-lg px-5 py-2 fw-bold w-100" style="font-size: 1.1rem; display:inline-block; max-width: 320px; margin: 0 auto;">
+                            ${jaRespondida ? '▶ Continuar vídeo' : 'Continuar sem responder'}
                         </button>
                     </div>
                 </div>
             </div>
         `;
 
+        // Centralizar vídeo na tela para o usuário ver o modal
+        if (this.wrapper) {
+            this.wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
         interactiveOverlay.style.display = 'flex';
+        // Bloquear scroll de forma robusta (funciona em iOS também)
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
         document.body.classList.add('lock-scroll');
+
         const modalContent = document.querySelector('.video-modal-content');
         if (modalContent) modalContent.classList.add('lock-scroll');
 
@@ -1033,29 +1231,49 @@ class VideoInterativoUniversal {
         const btnContinue = interactiveOverlay.querySelector('#btnContinueVideo');
         const btnConfirm = interactiveOverlay.querySelector('#btnConfirmQuestion');
 
-        // Lógica de Continuar (Unificada)
-        const handleContinue = () => {
+        // Lógica de Continuar (Unificada) - também usada pelo botão X
+        const handleContinue = (wasAnswered = false) => {
+            console.log(`[VideoInterativo] Fechando interação index:${index} (respondida:${wasAnswered})`);
             interactiveOverlay.style.display = 'none';
+            // Restaurar scroll
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
             document.body.classList.remove('lock-scroll');
-            const modalContent = document.querySelector('.video-modal-content');
-            if (modalContent) modalContent.classList.remove('lock-scroll');
+            const modalContentEl = document.querySelector('.video-modal-content');
+            if (modalContentEl) modalContentEl.classList.remove('lock-scroll');
             this.isLocked = false;
 
-            // Retomar o vídeo de forma robusta
+            // Se o usuário PULOU sem responder, marcar TODAS as interações neste mesmo tempo como skipped
+            if (!wasAnswered) {
+                const triggerTime = this.lastTriggeredTime;
+                this.config.interacoes.forEach(i => {
+                    if (i.tempo === triggerTime && !i.respondida) {
+                        i.skipped = true;
+                    }
+                });
+                console.log(`[VideoInterativo] Todas as interações em ${triggerTime}s marcadas como 'skipped'`);
+            }
+
+            // Retomar o vídeo do ponto atual (sem seek extra)
             if (this.youtubePlayer) {
                 this.youtubePlayer.playVideo();
             } else if (this.video) {
-                const playPromise = this.video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.warn("Retomada automática bloqueada:", error);
-                    });
-                }
+                this.video.play().catch(err => console.warn('Retomada bloqueada:', err));
             }
         };
 
         if (btnContinue) {
             btnContinue.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Se já estava respondida ao abrir, retomar normalmente
+                handleContinue(jaRespondida);
+            });
+        }
+
+        // Botão X - fecha igual ao "Continuar sem responder"
+        const btnClose = interactiveOverlay.querySelector('#btnCloseModal');
+        if (btnClose) {
+            btnClose.addEventListener('click', (e) => {
                 e.stopPropagation();
                 handleContinue();
             });
@@ -1101,13 +1319,20 @@ class VideoInterativoUniversal {
                     updateLMSScore();
                 }
 
-                // LIBERAR SCROLL IMEDIATAMENTE APÓS RESPONDER
-                document.body.classList.remove('lock-scroll');
-                const modalContent = document.querySelector('.video-modal-content');
-                if (modalContent) modalContent.classList.remove('lock-scroll');
-
-                // Esconder botão confirmar, mostrar botão continuar
+                // Esconder botão confirmar
                 btnConfirm.style.display = 'none';
+
+                // Reagir o botão continuar para passar wasAnswered=true (não pula 1s)
+                if (btnContinue) {
+                    btnContinue.replaceWith(btnContinue.cloneNode(true));
+                    const newBtnContinue = interactiveOverlay.querySelector('#btnContinueVideo');
+                    if (newBtnContinue) {
+                        newBtnContinue.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            handleContinue(true);
+                        });
+                    }
+                }
 
                 // Travar opções
                 radios.forEach(r => r.disabled = true);
@@ -1138,7 +1363,7 @@ class VideoInterativoUniversal {
         if (feedbackContainer) feedbackContainer.style.display = 'block';
 
         if (op.correta) {
-            if (msgSuccess) msgSuccess.innerHTML = op.msg || 'Resposta correta!';
+            if (msgSuccess) msgSuccess.innerHTML = 'Parabéns, você acertou! 🎉';
             if (fSuccess) fSuccess.style.display = 'block';
             if (fError) fError.style.display = 'none';
             // Estilizar opção selecionada como sucesso
@@ -1148,7 +1373,7 @@ class VideoInterativoUniversal {
                 selectedLabel.style.backgroundColor = '#d1e7dd';
             }
         } else {
-            if (msgError) msgError.innerHTML = op.msg || 'Resposta incorreta.';
+            if (msgError) msgError.innerHTML = 'Ops, você errou. Reveja o conteúdo!';
             if (fError) fError.style.display = 'block';
             if (fSuccess) fSuccess.style.display = 'none';
             // Estilizar opção selecionada como erro
@@ -1159,13 +1384,21 @@ class VideoInterativoUniversal {
             }
         }
 
-        if (btnContinue) btnContinue.style.display = 'inline-block';
+        // Atualizar botão: texto muda para "Continuar vídeo" e estilo para success
+        if (btnContinue) {
+            btnContinue.innerHTML = '▶ Continuar vídeo';
+            btnContinue.className = 'btn btn-success btn-lg px-5 py-2 fw-bold w-100';
+            btnContinue.style.maxWidth = '320px';
+            btnContinue.style.margin = '0 auto';
+            btnContinue.style.display = 'inline-block';
+        }
         
         // Re-renderizar MathJax se houver fórmulas no feedback
         if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
             window.MathJax.typesetPromise([overlayEl]);
         }
         // O listener de clique no btnContinue já foi configurado no openQuestion.
+
     }
 
 
@@ -1243,8 +1476,8 @@ class VideoInterativoUniversal {
     }
 
     findUnansweredInteraction(from, to) {
-        // Encontra a primeira interação não respondida no intervalo [from, to]
-        return this.config.interacoes.find(i => i.tempo > from && i.tempo <= to && !i.respondida);
+        // Encontra a primeira interação não respondida e não pulada no intervalo [from, to]
+        return this.config.interacoes.find(i => i.tempo > from && i.tempo <= to && !i.respondida && !i.skipped);
     }
 
     formatTime(s) {
@@ -1416,13 +1649,24 @@ class VideoInterativoUniversal {
             container.innerHTML = '';
         }
 
-        // Limpar overlay de perguntas
+        // Limpar overlay de perguntas e restaurar scroll
         const overlay = document.getElementById('interactiveOverlay');
-        if (overlay) {
-            overlay.remove();
-            document.body.classList.remove('lock-scroll');
-            const modalContent = document.querySelector('.video-modal-content');
-            if (modalContent) modalContent.classList.remove('lock-scroll');
+        if (overlay) overlay.remove();
+        
+        document.body.classList.remove('lock-scroll');
+        document.body.classList.remove('body-no-scroll');
+        document.documentElement.classList.remove('body-no-scroll');
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        
+        const modalContent = document.querySelector('.video-modal-content');
+        if (modalContent) modalContent.classList.remove('lock-scroll');
+
+        // Limpar AudioContext se existir
+        if (this.audioCtx) {
+            this.audioCtx.close().catch(() => {});
+            this.audioCtx = null;
+            this.gainNode = null;
         }
     }
 

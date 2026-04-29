@@ -1324,22 +1324,25 @@ function playNextEpisode() {
 
 function toggleFullscreen() {
     const elem = document.getElementById('senai-player-wrapper');
-    if (!document.fullscreenElement) {
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
+    if (!elem) return;
+
+    const isNativeSupported = !!(elem.requestFullscreen || elem.webkitRequestFullscreen || elem.msRequestFullscreen);
+    
+    if (isNativeSupported) {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+            if (elem.requestFullscreen) elem.requestFullscreen();
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+            else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
         }
     } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
+        // Fallback para Mobile/AVA onde a API nativa é bloqueada
+        elem.classList.toggle('mobile-fullscreen');
+        document.body.classList.toggle('body-no-scroll');
+        document.documentElement.classList.toggle('body-no-scroll');
     }
 }
 
@@ -1357,6 +1360,11 @@ function closeVideoPlayer() {
     setTimeout(() => {
         modal.style.display = 'none';
         document.body.classList.remove('modal-open');
+        document.body.classList.remove('lock-scroll');
+        document.body.classList.remove('body-no-scroll');
+        document.documentElement.classList.remove('body-no-scroll');
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
     }, 300);
 
     // Listener de ESC removido daqui, pois agora é gerenciado globalmente
